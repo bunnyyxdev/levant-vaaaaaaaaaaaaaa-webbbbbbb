@@ -25,3 +25,6 @@ ts-debug.log*
 # local env files
 .env*.local
 .env
+
+# acars app
+acars-app
