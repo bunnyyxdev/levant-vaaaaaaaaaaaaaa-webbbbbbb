@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 10 10 10;
+        --foreground: 255 255 255;
+        --primary: 14 165 233;
+        --accent-gold: 212 175 55;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: 'Inter', system-ui, sans-serif;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+        color: white;
+        min-height: 100vh;
+    }
+}
+
+@layer components {
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #D4AF37 0%, #CD7F32 100%);
+        color: #0a0a0a;
+        font-weight: 600;
+        padding: 12px 32px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        font-weight: 600;
+        padding: 12px 32px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .divider {
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #D4AF37, #CD7F32);
+        margin: 16px auto;
+        border-radius: 2px;
+    }
+
+    .text-gradient {
+        background: linear-gradient(135deg, #D4AF37 0%, #CD7F32 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .glow {
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+    }
+}
+
+@layer utilities {
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-fly-across {
+        animation: flyAcross 20s linear infinite;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @keyframes flyAcross {
+        0% {
+            transform: translateX(-100vw) translateY(50px) rotate(-5deg);
+            opacity: 0;
+        }
+
+        10% {
+            opacity: 1;
+        }
+
+        90% {
+            opacity: 1;
+        }
+
+        100% {
+            transform: translateX(100vw) translateY(-50px) rotate(5deg);
+            opacity: 0;
+        }
+    }
+}
