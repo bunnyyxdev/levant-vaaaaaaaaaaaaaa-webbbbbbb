@@ -125,7 +125,28 @@ export default function RegisterPage() {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
-        if (name === 'country') {
+        if (name === 'phoneNumber') {
+            // Enforce format: +[digits/spaces]
+            // If user deletes everything, allow it to be empty to let them restart typing
+            if (value === '') {
+                 setFormData({ ...formData, phoneNumber: '' });
+                 return;
+            }
+            
+            // If it doesn't start with +, add it (unless they are deleting)
+            let formattedValue = value;
+            if (!value.startsWith('+')) {
+                formattedValue = '+' + value.replace(/[^\d\s]/g, '');
+            } else {
+                // Allow + only at start, then digits and spaces
+                formattedValue = '+' + value.substring(1).replace(/[^\d\s]/g, '');
+            }
+
+            setFormData({
+                ...formData,
+                phoneNumber: formattedValue,
+            });
+        } else if (name === 'country') {
             // Update timezones when country changes
             const countryObj = countriesData.find((c) => c.name.common === value);
             setAvailableTimezones(countryObj ? countryObj.timezones : []);
@@ -371,6 +392,8 @@ export default function RegisterPage() {
                                             onChange={handleInputChange}
                                             required
                                             placeholder="e.g. +961 70 123 456"
+                                            pattern="^\+[0-9]{1,3}[0-9\s]{6,}$"
+                                            title="Please enter a valid phone number with country code (e.g. +1 555 123 4567)"
                                             className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
                                         />
                                     </div>

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate sequential pilot ID using Counter
-        const counter = await mongoose.model('Counter').findOneAndUpdate(
+        const counter = await Counter.findOneAndUpdate(
             { _id: 'pilot_id' },
             { $inc: { seq: 1 } },
             { upsert: true, new: true }
