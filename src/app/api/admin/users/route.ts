@@ -74,6 +74,7 @@ export async function PUT(request: NextRequest) {
         
         // Map camelCase to snake_case for database
         const fieldMapping: Record<string, string> = {
+            pilotId: 'pilot_id',
             firstName: 'first_name',
             lastName: 'last_name',
             email: 'email',

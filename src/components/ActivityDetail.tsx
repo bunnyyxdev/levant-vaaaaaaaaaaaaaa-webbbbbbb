@@ -305,10 +305,10 @@ export default function ActivityDetail({ activityId }: ActivityDetailProps) {
                                         </td>
                                         <td className="py-3 text-right">
                                             <Link 
-                                                href={`/portal/activities/leg/${leg._id}`}
-                                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
+                                                href={`/portal/dispatch?dep=${leg.departure_icao}&arr=${leg.arrival_icao}&aircraft=${leg.aircraft}`}
+                                                className="bg-accent-gold hover:bg-yellow-500 text-dark-900 px-3 py-1 rounded text-xs font-bold transition-colors"
                                             >
-                                                View
+                                                Dispatch
                                             </Link>
                                         </td>
                                     </tr>

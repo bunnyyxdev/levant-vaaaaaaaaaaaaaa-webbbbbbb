@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Plane, FileText, Send, ExternalLink, Users, Package, Navigation } from 'lucide-react';
 
 interface Airport {
@@ -21,11 +22,17 @@ interface FlightPlan {
 }
 
 export default function DispatchPage() {
+    const searchParams = useSearchParams();
+    
     const [departure, setDeparture] = useState('');
     const [arrival, setArrival] = useState('');
     const [alternate, setAlternate] = useState('');
     const [aircraftType, setAircraftType] = useState('');
-    const [callsign, setCallsign] = useState('');
+    const [flightNumber, setFlightNumber] = useState('');
+    
+    // Derived callsign
+    const callsign = `LVT${flightNumber}`;
+    
     const [flightType, setFlightType] = useState<'passenger' | 'cargo'>('passenger');
     const [passengers, setPassengers] = useState('');
     const [cargo, setCargo] = useState('');
@@ -66,10 +73,21 @@ export default function DispatchPage() {
                 const authData = await authRes.json();
                 if (authData.user) {
                     const pilotNum = authData.user.pilotId?.replace(/\D/g, '') || '';
-                    setCallsign(`LVT${pilotNum.padStart(3, '0')}`);
+                    setFlightNumber(pilotNum.padStart(4, '0')); // Ensure 4 digits logic or as is
                 }
 
-                // Fetch active bid
+                // Pre-fill from URL params if present
+                const depParam = searchParams.get('dep');
+                const arrParam = searchParams.get('arr');
+                const acParam = searchParams.get('aircraft');
+                const fltNumParam = searchParams.get('flt'); // Just in case we pass it
+
+                if (depParam) setDeparture(depParam.toUpperCase());
+                if (arrParam) setArrival(arrParam.toUpperCase());
+                if (acParam) setAircraftType(acParam.toUpperCase());
+                if (fltNumParam) setFlightNumber(fltNumParam);
+
+                // Fetch active bid (overwrite params if bid exists)
                 const bidRes = await fetch('/api/dispatch/bid');
                 const bidData = await bidRes.json();
                 if (bidData.bid) {
@@ -77,8 +95,8 @@ export default function DispatchPage() {
                         id: bidData.bid.id,
                         origin: bidData.bid.departure,
                         destination: bidData.bid.arrival,
-                        originName: '', // Will be updated by useMemo airport lookup
-                        destName: '',   // Will be updated by useMemo airport lookup
+                        originName: '', 
+                        destName: '',   
                         aircraft: bidData.bid.aircraft,
                         created: new Date(bidData.bid.createdAt),
                     });
@@ -93,7 +111,7 @@ export default function DispatchPage() {
         };
 
         loadInitialData();
-    }, []);
+    }, [searchParams]);
 
     // Airport lookup helper
     const getAirportInfo = (icao: string): Airport | undefined => {
@@ -229,7 +247,7 @@ export default function DispatchPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                            {/* Alternate */}
                         <div>
                             <label className="block text-sm text-gray-400 mb-2">Alternate</label>
                             <input
@@ -245,16 +263,26 @@ export default function DispatchPage() {
                                 </div>
                             )}
                         </div>
+                        
+                        {/* Callsign Split */}
                         <div>
                             <label className="block text-sm text-gray-400 mb-2">Callsign</label>
-                            <input
-                                type="text"
-                                value={callsign}
-                                readOnly
-                                className="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white font-mono uppercase cursor-not-allowed opacity-70"
-                            />
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value="LVT"
+                                    readOnly
+                                    className="w-20 bg-dark-800 border border-white/10 rounded-lg px-3 py-3 text-white font-mono uppercase text-center font-bold opacity-70 cursor-not-allowed"
+                                />
+                                <input
+                                    type="text"
+                                    value={flightNumber}
+                                    readOnly
+                                    className="flex-1 bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white font-mono uppercase cursor-not-allowed opacity-70"
+                                />
+                            </div>
                         </div>
-                    </div>
+
 
                     {/* Aircraft Type */}
                     <div>
