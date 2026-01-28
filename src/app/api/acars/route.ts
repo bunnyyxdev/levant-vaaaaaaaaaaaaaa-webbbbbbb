@@ -8,6 +8,9 @@ import Bid from '@/models/Bid';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import { checkAndUpgradeRank } from '@/lib/ranks';
+import { checkAndGrantAwards } from '@/lib/awards';
+import { notifyTakeoff, notifyLanding } from '@/lib/discord';
+import { autoPirepMinScore, autoPirepRejectLandingRate } from '@/config/config';
 
 // Handle ACARS requests
 export async function POST(request: NextRequest) {
@@ -99,6 +102,12 @@ async function handleAuth(params: { pilotId: string; password: string }) {
             if (valid) {
                 const sessionToken = Buffer.from(`${pilotId}:${Date.now()}`).toString('base64');
 
+                // Restore status to Active if LOA or Inactive
+                if (pilot.status === 'On leave (LOA)' || pilot.status === 'Inactive') {
+                    pilot.status = 'Active';
+                    await pilot.save();
+                }
+
                 return NextResponse.json({
                     success: true,
                     sessionToken,
@@ -136,7 +145,7 @@ async function handlePosition(params: {
     const { pilotId, callsign, latitude, longitude, altitude, heading, groundSpeed, status } = params;
 
     try {
-        await ActiveFlight.findOneAndUpdate(
+        const flight = await ActiveFlight.findOneAndUpdate(
             { pilot_id: pilotId, callsign },
             {
                 latitude,
@@ -146,8 +155,27 @@ async function handlePosition(params: {
                 ground_speed: groundSpeed,
                 status,
                 last_update: new Date()
-            }
+            },
+            { new: true }
         );
+
+        // Check for Takeoff Notification
+        if (flight && !flight.takeoff_notified && status === 'Airborne') {
+            flight.takeoff_notified = true;
+            await flight.save();
+
+            const pilot = await Pilot.findOne({ pilot_id: pilotId });
+            const pilotName = pilot ? `${pilot.first_name} ${pilot.last_name}` : pilotId;
+
+            await notifyTakeoff(
+                pilotName,
+                pilotId,
+                flight.departure_icao,
+                flight.arrival_icao,
+                flight.aircraft_type,
+                callsign
+            );
+        }
     } catch (error) {
         console.error('ACARS Position Update Error:', error);
     }
@@ -221,6 +249,7 @@ async function handlePirep(params: {
     pax?: number;
     cargo?: number;
     score?: number;
+    log?: any;
     comments?: string;
 }) {
     const {
@@ -239,6 +268,7 @@ async function handlePirep(params: {
         pax,
         cargo,
         score,
+        log,
         comments
     } = params;
 
@@ -247,6 +277,12 @@ async function handlePirep(params: {
         if (!pilot) {
             return NextResponse.json({ error: 'Pilot not found' }, { status: 404 });
         }
+
+        // Determine approval status
+        const isRejected = landingRate <= autoPirepRejectLandingRate;
+        const isAutoApproved = !isRejected && (score || 100) >= autoPirepMinScore;
+        
+        const status = isRejected ? 2 : (isAutoApproved ? 1 : 0);
 
         // 1. Create flight report
         await Flight.create({
@@ -266,10 +302,22 @@ async function handlePirep(params: {
             pax: pax || 0,
             cargo: cargo || 0,
             score: score || 100,
-            approved_status: 0, // Pending
+            deductions: log?.deductions || [],
+            log: log,
+            approved_status: status,
             comments: comments,
             submitted_at: new Date()
         });
+
+        if (isRejected) {
+            // 4. Remove from active flights even if rejected
+            await ActiveFlight.deleteOne({ pilot_id: pilot._id, callsign });
+
+            return NextResponse.json({ 
+                success: true, 
+                message: `PIREP submitted, but REJECTED! Landing rate of ${landingRate} fpm exceeds the safety threshold of ${autoPirepRejectLandingRate} fpm.`
+            });
+        }
 
         // 2. Calculate points: 10 per minute + 5 per NM
         let pointsEarned = Math.round((flightTimeMinutes * 10) + (distanceNm * 5));
@@ -294,16 +342,34 @@ async function handlePirep(params: {
                 total_credits: pointsEarned
             },
             current_location: arrivalIcao,
-            last_activity: new Date()
+            last_activity: new Date(),
+            status: 'Active'
         });
 
         // 4. Remove from active flights
         await ActiveFlight.deleteOne({ pilot_id: pilot._id, callsign });
 
-        // 5. Check for Rank Upgrade
+        // 5. Discord Notification (Landing)
+        await notifyLanding(
+            `${pilot.first_name} ${pilot.last_name}`,
+            pilot.pilot_id,
+            arrivalIcao,
+            landingRate,
+            score || 100,
+            callsign
+        );
+
+        // 6. Check for Rank Upgrade & Awards
         const newRank = await checkAndUpgradeRank(pilot._id.toString());
+        await checkAndGrantAwards(pilot._id.toString());
         
         let message = `PIREP submitted! You earned ${pointsEarned.toLocaleString()} points.`;
+        if (isAutoApproved) {
+            message += ` Your flight has been AUTO-APPROVED.`;
+        } else {
+            message += ` Your flight is PENDING review (Score below ${autoPirepMinScore}).`;
+        }
+
         if (dotmBonus > 0) message += ` (Includes ${dotmBonus} DOTM Bonus!)`;
         if (newRank) message += ` CONGRATULATIONS! You have been promoted to ${newRank}!`;
 

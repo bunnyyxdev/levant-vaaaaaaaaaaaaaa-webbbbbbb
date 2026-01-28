@@ -1,12 +1,6 @@
 import Pilot, { IPilot } from '@/models/Pilot';
-
-export const RANKS = [
-    { name: 'Cadet', hours: 0, flights: 0 },
-    { name: 'Second Officer', hours: 50, flights: 10 },
-    { name: 'First Officer', hours: 150, flights: 30 },
-    { name: 'Senior First Officer', hours: 300, flights: 60 },
-    { name: 'Captain', hours: 500, flights: 100 },
-];
+import Rank, { IRank } from '@/models/Rank';
+import { notifyRankPromotion } from './discord';
 
 /**
  * Checks if a pilot is eligible for a rank upgrade and performs it.
@@ -22,27 +16,43 @@ export async function checkAndUpgradeRank(pilotId: string): Promise<string | nul
         const currentHours = pilot.total_hours;
         const currentFlights = pilot.total_flights;
 
-        // Find the highest rank the pilot is eligible for
-        let eligibleRank = RANKS[0]; // Default to Cadet
+        // Fetch all ranks sorted by order
+        const allRanks = await Rank.find().sort({ order: 1 });
+        if (allRanks.length === 0) return null;
 
-        for (const rank of RANKS) {
-            if (currentHours >= rank.hours && currentFlights >= rank.flights) {
-                eligibleRank = rank;
+        // Find the current rank object to get its order
+        const currentRank = allRanks.find(r => r.name === currentRankName);
+        const currentOrder = currentRank ? currentRank.order : -1;
+
+        // Find the highest rank the pilot is eligible for (must have auto_promote = true)
+        let eligibleRank: IRank | null = null;
+
+        for (const rank of allRanks) {
+            // Only consider for auto-promotion if flag is set and pilot meets requirements
+            if (rank.auto_promote && currentHours >= rank.requirement_hours && currentFlights >= rank.requirement_flights) {
+                // If this rank's order is higher than the current pilot's rank order, it's a potential upgrade
+                if (rank.order > currentOrder) {
+                    if (!eligibleRank || rank.order > eligibleRank.order) {
+                        eligibleRank = rank;
+                    }
+                }
             }
         }
 
-        // Helper to get index for comparison
-        const getRankIndex = (name: string) => RANKS.findIndex(r => r.name === name);
-
-        const currentIndex = getRankIndex(currentRankName);
-        const newIndex = getRankIndex(eligibleRank.name);
-
-        // Only upgrade if the new rank is higher than current
-        if (newIndex > currentIndex) {
+        // Only upgrade if we found an eligible higher rank
+        if (eligibleRank) {
             console.log(`Upgrading Pilot ${pilot.pilot_id} from ${currentRankName} to ${eligibleRank.name}`);
             
             pilot.rank = eligibleRank.name;
             await pilot.save();
+            
+            // Send Discord notification
+            await notifyRankPromotion(
+                `${pilot.first_name} ${pilot.last_name}`,
+                pilot.pilot_id,
+                eligibleRank.name,
+                eligibleRank.image_url
+            );
             
             return eligibleRank.name;
         }

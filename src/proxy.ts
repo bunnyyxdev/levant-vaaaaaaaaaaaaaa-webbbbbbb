@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 import { jwtSecret } from './config/config';
 import { checkRateLimit } from './lib/rateLimit';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     // 1. Rate Limiting for API Routes

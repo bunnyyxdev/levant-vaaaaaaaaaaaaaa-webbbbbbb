@@ -46,7 +46,6 @@ export default function Sidebar() {
                 { name: 'Dispatch Center', path: '/portal/dispatch', icon: PlaneTakeoff },
                 { name: 'My Reports', path: '/portal/reports', icon: FileText },
                 { name: 'Tours & Events', path: '/portal/activities', icon: Map },
-                { name: 'Jumpseat', path: '/portal/jumpseats', icon: UserCheck },
                 { name: 'Leaderboard', path: '/portal/leaderboard', icon: Trophy },
                 { name: 'Downloads', path: '/portal/downloads', icon: Download },
             ],

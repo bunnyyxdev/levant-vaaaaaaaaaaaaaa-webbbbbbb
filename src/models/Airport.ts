@@ -72,8 +72,8 @@ const AirportSchema = new Schema<IAirport>({
     navaids: [NavaidSchema],
 });
 
-// Index for fast ICAO lookups
-AirportSchema.index({ icao: 1 });
+// Index for fast ICAO lookups (Already handled by unique: true)
+// AirportSchema.index({ icao: 1 });
 
 const Airport: Model<IAirport> = mongoose.models.Airport || mongoose.model<IAirport>('Airport', AirportSchema);
 

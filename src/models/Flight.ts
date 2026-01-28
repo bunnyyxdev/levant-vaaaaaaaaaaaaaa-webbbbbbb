@@ -17,7 +17,13 @@ export interface IFlight extends Document {
     pax?: number;
     cargo?: number;
     score?: number;
-    approved_status: number; // 0=Pending, 1=Approved, 2=Rejected
+    deductions?: Array<{
+        reason: string;
+        penalty: number;
+        timestamp: Date;
+    }>;
+    log?: any; // Detailed flight log data
+    approved_status: number; // 0=Pending, 1=Approved, 2=Rejected, 3=Reported
     comments?: string;
     admin_comments?: string;
     submitted_at: Date;
@@ -42,7 +48,13 @@ const FlightSchema = new Schema<IFlight>({
     pax: { type: Number, default: 0 },
     cargo: { type: Number, default: 0 },
     score: { type: Number, default: 100 },
-    approved_status: { type: Number, default: 0 }, // 0=Pending, 1=Approved, 2=Rejected
+    deductions: [{
+        reason: { type: String },
+        penalty: { type: Number },
+        timestamp: { type: Date }
+    }],
+    log: { type: Schema.Types.Mixed },
+    approved_status: { type: Number, default: 0 }, // 0=Pending, 1=Approved, 2=Rejected, 3=Reported
     comments: { type: String },
     admin_comments: { type: String },
     submitted_at: { type: Date, default: Date.now },

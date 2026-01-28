@@ -2,40 +2,54 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Pilot from '@/models/Pilot';
 import { sendInactivityReminderEmail, sendAccountInactiveEmail } from '@/lib/email';
+import { inactivityLoaDays, inactivityInactiveDays } from '@/config/config';
 
 export async function GET(request: NextRequest) {
     try {
         await connectDB();
 
-        // 1. Mark as Inactive (> 30 days)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        // 1. Mark as Inactive (> X days)
+        const sixtyDaysAgo = new Date();
+        sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - inactivityInactiveDays);
 
         const inactivePilots = await Pilot.find({
-            status: 'Active',
-            last_activity: { $lt: thirtyDaysAgo }
+            status: { $in: ['Active', 'On leave (LOA)'] },
+            last_activity: { $lt: sixtyDaysAgo }
         });
 
         for (const pilot of inactivePilots) {
             pilot.status = 'Inactive';
             await pilot.save();
             await sendAccountInactiveEmail(pilot.email, pilot.pilot_id, pilot.first_name);
-            console.log(`Pilot ${pilot.pilot_id} marked as Inactive due to 30d inactivity.`);
+            console.log(`Pilot ${pilot.pilot_id} marked as Inactive due to 60d inactivity.`);
         }
 
-        // 2. Send Reminder (> 14 days)
+        // 2. Mark as On leave (LOA) (> X days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - inactivityLoaDays);
+
+        const loaPilots = await Pilot.find({
+            status: 'Active',
+            last_activity: { $lt: thirtyDaysAgo, $gt: sixtyDaysAgo }
+        });
+
+        for (const pilot of loaPilots) {
+            pilot.status = 'On leave (LOA)';
+            await pilot.save();
+            // Optional: You might want to send a different email for LOA
+            console.log(`Pilot ${pilot.pilot_id} marked as On leave (LOA) due to 30d inactivity.`);
+        }
+
+        // 3. Send Reminder (> 14 days)
         const fourteenDaysAgo = new Date();
         fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
 
-        // We find pilots between 14 and 30 days who are still Active
         const reminderPilots = await Pilot.find({
             status: 'Active',
             last_activity: { $lt: fourteenDaysAgo, $gt: thirtyDaysAgo }
         });
 
         for (const pilot of reminderPilots) {
-            // In a real scenario, we might want to check if we already sent a reminder
-            // but for this implementation we'll trigger the email
             await sendInactivityReminderEmail(pilot.email, pilot.pilot_id, pilot.first_name);
             console.log(`Sent inactivity reminder to pilot ${pilot.pilot_id} (14d+)`);
         }
@@ -44,6 +58,7 @@ export async function GET(request: NextRequest) {
             success: true,
             processed: {
                 marked_inactive: inactivePilots.length,
+                marked_loa: loaPilots.length,
                 reminders_sent: reminderPilots.length
             }
         });

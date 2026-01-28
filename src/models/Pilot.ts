@@ -8,7 +8,7 @@ export interface IPilot extends Document {
     password: string;
     phone_number?: string;
     rank: string;
-    status: 'Active' | 'Inactive' | 'Blacklist' | 'Pending';
+    status: 'Active' | 'Inactive' | 'Blacklist' | 'Pending' | 'On leave (LOA)';
     role: 'Pilot' | 'Admin';
     is_admin: boolean;
     total_hours: number;
@@ -33,7 +33,7 @@ const PilotSchema = new Schema<IPilot>({
     password: { type: String, required: true },
     phone_number: { type: String },
     rank: { type: String, default: 'Cadet' },
-    status: { type: String, enum: ['Active', 'Inactive', 'Blacklist', 'Pending'], default: 'Pending' },
+    status: { type: String, enum: ['Active', 'Inactive', 'Blacklist', 'Pending', 'On leave (LOA)'], default: 'Pending' },
     role: { type: String, enum: ['Pilot', 'Admin'], default: 'Pilot' },
     is_admin: { type: Boolean, default: false },
     total_hours: { type: Number, default: 0 },

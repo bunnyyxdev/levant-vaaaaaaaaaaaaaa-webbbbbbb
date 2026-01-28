@@ -7,7 +7,7 @@ export interface IActivityLeg {
     departure_icao?: string; // Optional = "Any"
     arrival_icao?: string;   // Optional = "Any"
     flight_number?: string;  // Optional = "Any"
-    aircraft?: string;       // Optional = "Any"
+    aircraft_types?: string[]; // Multiple allowed aircraft ICAO codes
     distance_nm?: number;
 }
 
@@ -45,7 +45,7 @@ const ActivityLegSchema = new Schema<IActivityLeg>({
     departure_icao: { type: String },
     arrival_icao: { type: String },
     flight_number: { type: String },
-    aircraft: { type: String },
+    aircraft_types: [{ type: String }],
     distance_nm: { type: Number },
 });
 

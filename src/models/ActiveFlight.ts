@@ -13,6 +13,7 @@ export interface IActiveFlight extends Document {
     heading: number;
     ground_speed: number;
     status: string;
+    takeoff_notified: boolean;
     started_at: Date;
     last_update: Date;
 }
@@ -30,6 +31,7 @@ const ActiveFlightSchema = new Schema<IActiveFlight>({
     heading: { type: Number, default: 0 },
     ground_speed: { type: Number, default: 0 },
     status: { type: String, default: 'Preflight' },
+    takeoff_notified: { type: Boolean, default: false },
     started_at: { type: Date, default: Date.now },
     last_update: { type: Date, default: Date.now },
 });

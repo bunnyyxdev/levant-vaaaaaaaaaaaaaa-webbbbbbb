@@ -21,7 +21,9 @@ interface FlightPlan {
     created: Date;
 }
 
-export default function DispatchPage() {
+import { Suspense } from 'react';
+
+function DispatchContent() {
     const searchParams = useSearchParams();
     
     const [departure, setDeparture] = useState('');
@@ -29,6 +31,7 @@ export default function DispatchPage() {
     const [alternate, setAlternate] = useState('');
     const [aircraftType, setAircraftType] = useState('');
     const [flightNumber, setFlightNumber] = useState('');
+    const [weightUnit, setWeightUnit] = useState<'KGS' | 'LBS'>('KGS');
     
     // Derived callsign
     const callsign = `LVT${flightNumber}`;
@@ -137,6 +140,7 @@ export default function DispatchPage() {
             ...(callsign && { fltnum: callsign }),
             ...(flightType === 'passenger' && passengers && { pax: passengers }),
             ...(cargo && { cargo: cargo }),
+            units: weightUnit
         });
 
         const url = `https://www.simbrief.com/system/dispatch.php?${params.toString()}`;
@@ -340,14 +344,28 @@ export default function DispatchPage() {
                                 />
                             </div>
                         )}
-                        <div>
-                            <label className="block text-sm text-gray-400 mb-2">Cargo (kg)</label>
-                            <input
-                                type="number"
-                                value={cargo}
-                                onChange={(e) => setCargo(e.target.value)}
-                                className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold"
-                            />
+                        <div className="grid grid-cols-3 gap-2">
+                            <div className="col-span-2">
+                                <label className="block text-sm text-gray-400 mb-2">Cargo</label>
+                                <input
+                                    type="number"
+                                    value={cargo}
+                                    onChange={(e) => setCargo(e.target.value)}
+                                    className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold"
+                                    placeholder="0"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-400 mb-2">Unit</label>
+                                <select
+                                    value={weightUnit}
+                                    onChange={(e) => setWeightUnit(e.target.value as 'KGS' | 'LBS')}
+                                    className="w-full bg-dark-700 border border-white/10 rounded-lg px-2 py-3 text-white focus:outline-none focus:border-accent-gold appearance-none text-center font-bold"
+                                >
+                                    <option value="KGS">KG</option>
+                                    <option value="LBS">LB</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -439,5 +457,17 @@ export default function DispatchPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function DispatchPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-gold"></div>
+            </div>
+        }>
+            <DispatchContent />
+        </Suspense>
     );
 }

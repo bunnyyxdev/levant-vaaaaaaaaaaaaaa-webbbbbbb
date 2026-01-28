@@ -51,8 +51,11 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Update last activity
+        // Update last activity and restore status if needed
         user.last_activity = new Date();
+        if (user.status === 'On leave (LOA)' || user.status === 'Inactive') {
+            user.status = 'Active';
+        }
         await user.save();
 
         // Create JWT

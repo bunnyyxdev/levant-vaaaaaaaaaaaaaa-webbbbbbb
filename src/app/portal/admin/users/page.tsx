@@ -28,6 +28,7 @@ const statusColors: Record<string, string> = {
     'Inactive': 'bg-yellow-500/20 text-yellow-400',
     'Blacklist': 'bg-red-500/20 text-red-400',
     'Pending': 'bg-blue-500/20 text-blue-400',
+    'On leave (LOA)': 'bg-gray-500/20 text-gray-300',
 };
 
 const roleColors: Record<string, string> = {
@@ -144,11 +145,14 @@ export default function AdminUsersPage() {
                     <span className="flex items-center text-blue-400"> // id: 65
                         <AlertTriangle className="w-4 h-4 mr-1" /> Pending: {users.filter(u => u.status === 'Pending').length} // id: 66
                     </span> // id: 67
-                    <span className="flex items-center text-yellow-400"> // id: 68
-                        <AlertTriangle className="w-4 h-4 mr-1" /> Inactive: {users.filter(u => u.status === 'Inactive').length} // id: 69
-                    </span> // id: 70
-                    <span className="flex items-center text-red-400"> // id: 71
-                        <UserX className="w-4 h-4 mr-1" /> Blacklisted: {users.filter(u => u.status === 'Blacklist').length} // id: 72
+                    <span className="flex items-center text-yellow-400">
+                        <AlertTriangle className="w-4 h-4 mr-1" /> Inactive: {users.filter(u => u.status === 'Inactive').length}
+                    </span>
+                    <span className="flex items-center text-gray-400">
+                        <AlertTriangle className="w-4 h-4 mr-1" /> LOA: {users.filter(u => u.status === 'On leave (LOA)').length}
+                    </span>
+                    <span className="flex items-center text-red-400">
+                        <UserX className="w-4 h-4 mr-1" /> Blacklisted: {users.filter(u => u.status === 'Blacklist').length}
                     </span> // id: 73
                 </div> // id: 74
             </div> // id: 75
@@ -299,6 +303,7 @@ export default function AdminUsersPage() {
                                 >
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
+                                    <option value="On leave (LOA)">On leave (LOA)</option>
                                     <option value="Pending">Pending</option>
                                     <option value="Blacklist">Blacklist</option>
                                 </select>

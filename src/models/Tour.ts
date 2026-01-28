@@ -9,6 +9,7 @@ export interface ITour extends Document {
         leg_number: number;
         departure_icao: string;
         arrival_icao: string;
+        aircraft_types?: string[];
         distance_nm?: number;
     }[];
     total_distance: number;
@@ -27,6 +28,7 @@ const TourSchema = new Schema<ITour>({
         leg_number: { type: Number, required: true },
         departure_icao: { type: String, required: true },
         arrival_icao: { type: String, required: true },
+        aircraft_types: [{ type: String }],
         distance_nm: { type: Number },
     }],
     total_distance: { type: Number, default: 0 },

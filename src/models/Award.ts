@@ -5,7 +5,7 @@ export interface IAward extends Document {
     name: string;
     description?: string;
     imageUrl?: string;        // Image file in /img/badge/ or /img/award/
-    category?: string;        // e.g., 'Flight Hours', 'Landings', 'Tours', 'Special'
+    category?: 'Flight Hours' | 'Landings' | 'Flights' | 'Tours' | 'Special';
     criteria?: string;        // Human-readable criteria for earning
     requiredValue?: number;   // Numeric threshold (e.g., 100 hours)
     active: boolean;
