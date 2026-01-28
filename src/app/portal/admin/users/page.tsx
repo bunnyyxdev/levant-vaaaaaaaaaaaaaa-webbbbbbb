@@ -44,6 +44,7 @@ export default function AdminUsersPage() {
     const [editForm, setEditForm] = useState<Partial<User>>({});
     const [updating, setUpdating] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [error, setError] = useState('');
 
     useEffect(() => {
         fetchUsers();
@@ -65,6 +66,7 @@ export default function AdminUsersPage() {
 
     const openEditModal = (user: User) => {
         setSelectedUser(user);
+        setError(''); // Clear previous errors
         setEditForm({
             firstName: user.firstName,
             lastName: user.lastName,
@@ -85,6 +87,8 @@ export default function AdminUsersPage() {
     const updateUser = async () => {
         if (!selectedUser) return;
         setUpdating(true);
+        setError('');
+        
         try {
             const res = await fetch('/api/admin/users', {
                 method: 'PUT',
@@ -94,12 +98,18 @@ export default function AdminUsersPage() {
                     ...editForm 
                 }),
             });
-            if (res.ok) {
-                await fetchUsers();
-                setSelectedUser(null);
+            
+            const data = await res.json();
+            
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to update user');
             }
-        } catch (error) {
+
+            await fetchUsers();
+            setSelectedUser(null);
+        } catch (error: any) {
             console.error('Error updating user:', error);
+            setError(error.message || 'An unexpected error occurred');
         } finally {
             setUpdating(false);
         }
@@ -213,6 +223,13 @@ export default function AdminUsersPage() {
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
+
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center text-red-400">
+                                <AlertTriangle className="w-5 h-5 mr-2 flex-shrink-0" />
+                                {error}
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* First Name */}
@@ -341,8 +358,8 @@ export default function AdminUsersPage() {
                                 <input
                                     type="number"
                                     step="0.1"
-                                    value={editForm.totalHours || 0}
-                                    onChange={e => setEditForm({ ...editForm, totalHours: parseFloat(e.target.value) })}
+                                    value={editForm.totalHours ?? 0}
+                                    onChange={e => setEditForm({ ...editForm, totalHours: parseFloat(e.target.value) || 0 })}
                                     className="w-full bg-dark-700 border border-white/10 rounded px-3 py-2 text-white"
                                 />
                             </div>
@@ -352,8 +369,8 @@ export default function AdminUsersPage() {
                                 <label className="block text-sm text-gray-400 mb-1">Total Flights</label>
                                 <input
                                     type="number"
-                                    value={editForm.totalFlights || 0}
-                                    onChange={e => setEditForm({ ...editForm, totalFlights: parseInt(e.target.value) })}
+                                    value={editForm.totalFlights ?? 0}
+                                    onChange={e => setEditForm({ ...editForm, totalFlights: parseInt(e.target.value) || 0 })}
                                     className="w-full bg-dark-700 border border-white/10 rounded px-3 py-2 text-white"
                                 />
                             </div>
@@ -363,8 +380,8 @@ export default function AdminUsersPage() {
                                 <label className="block text-sm text-gray-400 mb-1">Total Credits</label>
                                 <input
                                     type="number"
-                                    value={editForm.totalCredits || 0}
-                                    onChange={e => setEditForm({ ...editForm, totalCredits: parseInt(e.target.value) })}
+                                    value={editForm.totalCredits ?? 0}
+                                    onChange={e => setEditForm({ ...editForm, totalCredits: parseInt(e.target.value) || 0 })}
                                     className="w-full bg-dark-700 border border-white/10 rounded px-3 py-2 text-white"
                                 />
                             </div>
