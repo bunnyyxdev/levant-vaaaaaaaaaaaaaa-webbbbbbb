@@ -52,37 +52,63 @@ export default function DashboardPage() {
 
     useEffect(() => {
         setMounted(true);
-        fetchDashboardData();
+        // Start all fetches in parallel but don't wait for all to finish before rendering what we have
+        fetchStats();
+        fetchPilots();
+        fetchReports();
+        fetchFlights();
+        fetchDotm();
     }, []);
 
-    const fetchDashboardData = async () => {
+    const fetchStats = async () => {
         try {
-            const [statsRes, pilotsRes, reportsRes, flightsRes, dotmRes] = await Promise.all([
-                fetch('/api/portal/stats'),
-                fetch('/api/portal/new-pilots'),
-                fetch('/api/portal/reports/recent'),
-                fetch('/api/portal/active-flights'),
-                fetch('/api/dotm'),
-            ]);
+            const res = await fetch('/api/portal/stats');
+            const data = await res.json();
+            if (data.stats) {
+                setDashboardData(prev => ({ ...prev, stats: data.stats }));
+            }
+        } catch (err) { console.error('Stats fetch error:', err); }
+    };
 
-            const stats = await statsRes.json().catch(() => ({}));
-            const pilots = await pilotsRes.json().catch(() => ({}));
-            const reports = await reportsRes.json().catch(() => ({}));
-            const flights = await flightsRes.json().catch(() => ({}));
-            const dotm = await dotmRes.json().catch(() => ({}));
+    const fetchPilots = async () => {
+        try {
+            const res = await fetch('/api/portal/new-pilots');
+            const data = await res.json();
+            if (data.pilots) {
+                setDashboardData(prev => ({ ...prev, newestPilots: data.pilots }));
+            }
+        } catch (err) { console.error('Pilots fetch error:', err); }
+    };
 
-            setDashboardData({
-                stats: stats?.stats || [],
-                newestPilots: pilots?.pilots || [],
-                recentReports: reports?.reports || [],
-                activeFlights: flights?.activeFlights || [],
-                dotm: dotm?.dotm || null,
-            });
-        } catch (error) {
-            console.error('Error fetching dashboard data:', error);
-        } finally {
-            setLoading(false);
-        }
+    const fetchReports = async () => {
+        try {
+            const res = await fetch('/api/portal/reports/recent');
+            const data = await res.json();
+            if (data.reports) {
+                setDashboardData(prev => ({ ...prev, recentReports: data.reports }));
+            }
+        } catch (err) { console.error('Reports fetch error:', err); }
+    };
+
+    const fetchFlights = async () => {
+        try {
+            const res = await fetch('/api/portal/active-flights');
+            const data = await res.json();
+            if (data.activeFlights) {
+                setDashboardData(prev => ({ ...prev, activeFlights: data.activeFlights }));
+            }
+        } catch (err) { console.error('Active flights fetch error:', err); }
+    };
+
+    const fetchDotm = async () => {
+        try {
+            const res = await fetch('/api/dotm');
+            const data = await res.json();
+            if (data.dotm) {
+                setDashboardData(prev => ({ ...prev, dotm: data.dotm }));
+            }
+        } catch (err) { console.error('DOTM fetch error:', err); }
+        finally { setLoading(false); } // Turn off main loading indicator when at least one thing finishes (or keep it until critical data is loaded)
     };
 
     if (loading && !mounted) {
