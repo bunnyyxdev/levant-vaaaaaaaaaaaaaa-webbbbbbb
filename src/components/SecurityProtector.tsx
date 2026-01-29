@@ -12,13 +12,6 @@ import { useEffect } from 'react';
  */
 export default function SecurityProtector() {
     useEffect(() => {
-        // 1. Register Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw-protector.js')
-                .then(reg => console.log('Protector Service Worker registered'))
-                .catch(err => console.error('Protector Service Worker registration failed:', err));
-        }
-
         // 4. Disable Image Dragging
         const handleDragStart = (e: DragEvent) => {
             const target = e.target as HTMLElement;

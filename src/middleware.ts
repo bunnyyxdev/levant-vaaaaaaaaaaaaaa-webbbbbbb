@@ -23,19 +23,21 @@ export async function middleware(request: NextRequest) {
     }
 
     if (token) {
-        if (pathname === '/login') {
-            console.log('Middleware: Path is /login, redirecting to dashboard');
-            return NextResponse.redirect(new URL('/portal/dashboard', request.url));
-        }
         try {
             const secret = new TextEncoder().encode(jwtSecret);
             const { payload } = await jwtVerify(token, secret);
-            console.log('Middleware: Token verified successfully. Email:', payload.email);
+            console.log(`Middleware: Token verified. Email: ${payload.email}, Role: ${payload.role}, isAdmin: ${payload.isAdmin}`);
 
             // Check if user is blacklisted
             if (payload.status === 'Blacklist') {
                 console.log('Middleware: User blacklisted, rewriting to 404');
                 return NextResponse.rewrite(new URL('/404', request.url));
+            }
+
+            // If we are at /login but have a valid token, go to portal
+            if (pathname === '/login') {
+                console.log('Middleware: Path is /login, redirecting to dashboard');
+                return NextResponse.redirect(new URL('/portal/dashboard', request.url));
             }
 
         } catch (error: any) {

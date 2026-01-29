@@ -24,7 +24,7 @@ export async function GET() {
 
         // Create admin
         const admin = await Pilot.create({
-            pilot_id: 'LVT0001',
+            pilot_id: 'LVT0000',
             first_name: 'Admin',
             last_name: 'User',
             email: adminEmail,
@@ -33,10 +33,10 @@ export async function GET() {
             status: 'Active',
             role: 'Admin',
             is_admin: true,
-            country: 'LB',
-            city: 'Beirut',
-            timezone: 'Asia/Beirut',
-            current_location: 'OLBA',
+            country: 'TH',
+            city: 'Bangkok',
+            timezone: 'Asia/Bangkok',
+            current_location: 'VTBS',
         });
 
         return NextResponse.json({

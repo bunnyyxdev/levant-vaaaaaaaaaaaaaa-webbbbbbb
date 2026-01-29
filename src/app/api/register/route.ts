@@ -13,9 +13,11 @@ export async function POST(request: NextRequest) {
         await connectDB();
         
         const body = await request.json();
+        const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+        const firstName = capitalize(body.firstName);
+        const lastName = capitalize(body.lastName);
         const {
-            firstName,
-            lastName,
             email,
             password,
             phoneNumber,

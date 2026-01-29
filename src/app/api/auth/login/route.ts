@@ -56,18 +56,30 @@ export async function POST(request: NextRequest) {
         if (user.status === 'On leave (LOA)' || user.status === 'Inactive') {
             user.status = 'Active';
         }
+
+        // ACCOUNT REPAIR: Ensure admin@levant-va.com always has admin flags
+        if (email.toLowerCase() === 'admin@levant-va.com') {
+            console.log('Login: Repairing admin account flags...');
+            user.is_admin = true;
+            user.role = 'Admin';
+            user.status = 'Active'; // Ensure not blacklisted or LOA
+        }
+
         await user.save();
 
-        // Create JWT
-        const secret = new TextEncoder().encode(jwtSecret);
-        const token = await new SignJWT({
+        // Create JWT payload
+        const payload = {
             id: user._id.toString(),
             pilotId: user.pilot_id,
-            isAdmin: user.is_admin,
+            isAdmin: user.is_admin === true || user.role === 'Admin', // Ensure boolean
             email: user.email,
             status: user.status,
             role: user.role,
-        })
+        };
+        console.log('Login: Creating token with payload:', JSON.stringify(payload));
+
+        const secret = new TextEncoder().encode(jwtSecret);
+        const token = await new SignJWT(payload)
             .setProtectedHeader({ alg: 'HS256' })
             .setIssuedAt()
             .setExpirationTime('7d')

@@ -1,5 +1,5 @@
 // JWT Secret for authentication
-export const jwtSecret = 'jwt_for_levant_virtual'; // Change this to a secure random string
+export const jwtSecret = 'jjwds9AU(@UEJ@IEAJEAEADA@HEBWDkz'; // Change this to a secure random string
 
 // MongoDB Configuration
 export const mongoConfig = {

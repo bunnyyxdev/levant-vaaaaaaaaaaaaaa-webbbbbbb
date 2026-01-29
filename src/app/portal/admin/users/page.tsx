@@ -36,7 +36,7 @@ const roleColors: Record<string, string> = {
     'Pilot': 'bg-blue-500/20 text-blue-400',
 };
 
-const ranks = ['Cadet', 'Second Officer', 'First Officer', 'Captain', 'Senior Captain', 'Administrator'];
+const ranks = ['Cadet', 'Second Officer', 'First Officer', 'Captain', 'Senior Captain'];
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState<User[]>([]);

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import {
     LayoutDashboard,
     User,
@@ -29,6 +30,22 @@ interface MenuItem {
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const res = await fetch('/api/auth/me');
+                if (res.ok) {
+                    const data = await res.json();
+                    setIsAdmin(data.user?.isAdmin || data.user?.role === 'Admin');
+                }
+            } catch (error) {
+                console.error('Sidebar: Auth check failed', error);
+            }
+        };
+        checkAuth();
+    }, []);
 
     const isActive = (path: string) => pathname?.startsWith(path);
 
@@ -80,8 +97,10 @@ export default function Sidebar() {
             </div>
 
             <div className="flex-1 px-4 space-y-8">
-                {menuItems.map((category) => (
-                    <div key={category.category}>
+                {menuItems.map((category) => {
+                    if (category.category === 'ADMIN' && !isAdmin) return null;
+                    return (
+                        <div key={category.category}>
                         <h3 className="text-xs font-semibold text-gray-500 tracking-wider mb-4 px-2">
                             {category.category}
                         </h3>
@@ -117,7 +136,7 @@ export default function Sidebar() {
                             ))}
                         </div>
                     </div>
-                ))}
+                );})}
             </div>
 
             <div className="p-4 border-t border-white/5">
