@@ -39,15 +39,15 @@ export async function middleware(request: NextRequest) {
             }
 
         } catch (error: any) {
-            console.error('Middleware: Verification FAILED:', error.code || error.message);
-            // Token invalid - clear it and redirect to home if on protected route
+            const errorMsg = error.code || error.message;
+            console.error('Middleware: Verification FAILED:', errorMsg);
+            
             if (pathname.startsWith('/portal')) {
                 console.log('Middleware: Access to protected route denied. Redirecting Home.');
                 const response = NextResponse.redirect(new URL('/', request.url));
-                response.cookies.set('auth_token', '', { path: '/', maxAge: 0 }); // Explicit clear
+                response.cookies.set('auth_token', '', { path: '/', maxAge: 0 });
                 return response;
             }
-            return NextResponse.next();
         }
     } else {
         // Protected routes check

@@ -52,7 +52,7 @@ export default function Hero() {
                     <Link href="#about" className="btn-primary inline-block">
                         Explore Now!
                     </Link>
-                    <Link href="/login" className="btn-secondary inline-block">
+                    <Link href="/portal/dashboard" className="btn-secondary inline-block">
                         Pilot Portal
                     </Link>
                 </div>
