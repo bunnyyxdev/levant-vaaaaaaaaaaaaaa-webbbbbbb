@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, CheckCircle, XCircle, AlertCircle, Info, MessageSquare } from 'lucide-react';
 
 interface PIREP {
@@ -81,10 +81,12 @@ export default function AdminPirepsPage() {
         }
     };
 
-    const filteredPireps = pireps.filter(p => 
-        p.callsign.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.pilot_name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredPireps = useMemo(() => {
+        return pireps.filter(p => 
+            p.callsign.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.pilot_name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [pireps, searchTerm]);
 
     return (
         <div className="space-y-6">

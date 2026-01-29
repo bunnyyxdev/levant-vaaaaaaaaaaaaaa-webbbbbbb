@@ -49,8 +49,10 @@ export async function proxy(request: NextRequest) {
                 return NextResponse.redirect(new URL('/portal/dashboard', request.url));
             }
         } catch (error) {
-            // Token invalid - clear it
-            const response = NextResponse.next();
+            // Token invalid - clear it and redirect to login if on protected route
+            const response = pathname.startsWith('/portal')
+                ? NextResponse.redirect(new URL('/login', request.url))
+                : NextResponse.next();
             response.cookies.delete('auth_token');
             return response;
         }
