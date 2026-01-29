@@ -89,9 +89,9 @@ export async function POST(request: NextRequest) {
         // Set Cookie
         response.cookies.set('auth_token', token, {
             httpOnly: true,
-            secure: true, // Always use secure in production/Vercel
+            secure: process.env.NODE_ENV === 'production', // Only secure in production
             sameSite: 'lax',
-            maxAge: 60 * 60 * 24 * 7, // Extend to 7 days for "one-time" login feel
+            maxAge: 60 * 60 * 24 * 7, 
             path: '/',
         });
 

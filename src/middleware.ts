@@ -42,6 +42,7 @@ export async function middleware(request: NextRequest) {
             }
 
         } catch (error) {
+            console.log('Middleware: Token verification failed:', error);
             // Token invalid - clear it and redirect to home if on protected route
             const response = pathname.startsWith('/portal')
                 ? NextResponse.redirect(new URL('/', request.url))
@@ -52,6 +53,7 @@ export async function middleware(request: NextRequest) {
     } else {
         // Protected routes check
         if (pathname.startsWith('/portal')) {
+            console.log('Middleware: No token found for protected route:', pathname);
             return NextResponse.redirect(new URL('/', request.url));
         }
     }
