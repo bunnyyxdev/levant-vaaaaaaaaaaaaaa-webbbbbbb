@@ -69,6 +69,7 @@ export default function AdminUsersPage() {
         setSelectedUser(user);
         setError('');
         setEditForm({
+            pilotId: user.pilotId,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
@@ -139,6 +140,11 @@ export default function AdminUsersPage() {
         return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
     };
 
+    const getRankImage = (rank: string) => {
+        const normalized = rank.toLowerCase().replace(/\s/g, '');
+        return `/img/ranks/${normalized}.png`;
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -205,8 +211,19 @@ export default function AdminUsersPage() {
                         <div className="p-6">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-dark-700 to-dark-800 border border-white/10 flex items-center justify-center text-lg font-bold text-gray-300 shadow-inner">
-                                        {getInitials(user.firstName, user.lastName)}
+                                    <div className="relative">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-dark-700 to-dark-800 border border-white/10 flex items-center justify-center text-lg font-bold text-gray-300 shadow-inner overflow-hidden">
+                                            {getInitials(user.firstName, user.lastName)}
+                                        </div>
+                                        {/* Rank Epaulet Overlay */}
+                                        <div className="absolute -bottom-2 -right-2 bg-dark-900 rounded-full p-1 border border-white/10 shadow-lg" title={user.rank}>
+                                            <img 
+                                                src={getRankImage(user.rank)} 
+                                                alt={user.rank}
+                                                className="w-6 h-auto object-contain"
+                                                onError={(e) => (e.currentTarget.style.display = 'none')}
+                                            />
+                                        </div>
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-bold text-white group-hover:text-accent-gold transition-colors">{user.firstName} {user.lastName}</h3>

@@ -110,6 +110,75 @@ export default function DownloadsPage() {
                 </div>
             </div>
 
+            {/* Flight Simulator Integration */}
+            <div className="grid md:grid-cols-2 gap-6">
+                {/* X-Plane Plugin Card */}
+                <div className="glass-card p-6 relative group overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:bg-blue-500/20" />
+                    
+                    <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-dark-800 rounded-xl border border-white/10 group-hover:border-blue-500/50 transition-colors">
+                                <Radio className="w-8 h-8 text-blue-400" />
+                            </div>
+                            {zipFile && (
+                                <span className="px-3 py-1 bg-white/5 rounded-full text-xs font-mono text-gray-400 border border-white/5">
+                                    v{zipFile.version}
+                                </span>
+                            )}
+                        </div>
+
+                        <h3 className="text-xl font-bold text-white mb-2">X-Plane 11/12 Plugin</h3>
+                        <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                            Required integration plugin for X-Plane users. Handles data synchronization between the simulator and the Levant ACARS Tracker.
+                        </p>
+
+                        {loading ? (
+                             <div className="h-10 bg-white/5 rounded-lg w-full animate-pulse" />
+                        ) : zipFile ? (
+                            <a 
+                                href={zipFile.filePath}
+                                download
+                                className="flex items-center justify-center gap-2 w-full bg-dark-800 hover:bg-dark-700 text-white py-3 rounded-lg font-medium transition-all group-hover:shadow-lg border border-white/10 group-hover:border-white/20"
+                            >
+                                <Download className="w-4 h-4 text-blue-400" />
+                                Download Plugin
+                            </a>
+                        ) : (
+                            <button disabled className="w-full bg-white/5 text-gray-500 py-3 rounded-lg font-medium cursor-not-allowed">
+                                Not Available
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Operations Manual */}
+                <div className="glass-card p-6 relative group overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-accent-gold/10 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:bg-accent-gold/20" />
+                    
+                    <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="p-3 bg-dark-800 rounded-xl border border-white/10 group-hover:border-accent-gold/50 transition-colors">
+                                <BookOpen className="w-8 h-8 text-accent-gold" />
+                            </div>
+                        </div>
+
+                        <h3 className="text-xl font-bold text-white mb-2">Operations Manual</h3>
+                        <p className="text-gray-400 text-sm mb-6 leading-relaxed">
+                            Comprehensive guide to Levant Virtual Airline operations, ACARS usage, and pilot regulations.
+                        </p>
+
+                        <Link 
+                            href="/portal/handbook"
+                            className="flex items-center justify-center gap-2 w-full bg-dark-800 hover:bg-dark-700 text-white py-3 rounded-lg font-medium transition-all group-hover:shadow-lg border border-white/10 group-hover:border-white/20"
+                        >
+                            <ExternalLink className="w-4 h-4 text-accent-gold" />
+                            View Handbook
+                        </Link>
+                    </div>
+                </div>
+            </div>
+
             {/* Security Note */}
             <div className="glass-card p-6 flex items-start gap-4 mt-8">
                  <Shield className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />

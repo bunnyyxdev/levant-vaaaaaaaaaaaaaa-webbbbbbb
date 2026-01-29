@@ -3,6 +3,7 @@ import { verifyAuth } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Pilot from '@/models/Pilot';
 import { sendAccountActivatedEmail, sendAccountInactiveEmail } from '@/lib/email';
+import { checkAndUpgradeRank } from '@/lib/ranks';
 
 // GET - List all users with roles and status
 export async function GET() {
@@ -118,6 +119,11 @@ export async function PUT(request: NextRequest) {
                 // Account marked inactive
                 await sendAccountInactiveEmail(user.email, user.pilot_id, user.first_name);
             }
+        }
+
+        // Auto-check for rank promotion if hours/flights changed
+        if (updates.totalHours || updates.totalFlights) {
+            await checkAndUpgradeRank(userId);
         }
 
         return NextResponse.json({ success: true, message: 'User updated successfully' });

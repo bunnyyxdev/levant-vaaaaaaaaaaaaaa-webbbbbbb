@@ -132,18 +132,17 @@ function DispatchContent() {
             return;
         }
 
-        const params = new URLSearchParams({
-            orig: departure.toUpperCase(),
-            dest: arrival.toUpperCase(),
-            type: aircraftType.toUpperCase(),
-            ...(alternate && { altn: alternate.toUpperCase() }),
-            ...(callsign && { fltnum: callsign }),
-            ...(flightType === 'passenger' && passengers && { pax: passengers }),
-            ...(cargo && { cargo: cargo }),
-            units: weightUnit
-        });
+        // Use the specific link format requested by user, appending other details
+        let url = `https://www.simbrief.com/system/dispatch.php?orig=${departure.toUpperCase()}&dest=${arrival.toUpperCase()}`;
+        
+        // Append other important details for a complete dispatch
+        if (aircraftType) url += `&type=${aircraftType.toUpperCase()}`;
+        if (alternate) url += `&altn=${alternate.toUpperCase()}`;
+        if (callsign) url += `&fltnum=${callsign}`;
+        if (flightType === 'passenger' && passengers) url += `&pax=${passengers}`;
+        if (cargo) url += `&cargo=${cargo}`;
+        url += `&units=${weightUnit}`;
 
-        const url = `https://www.simbrief.com/system/dispatch.php?${params.toString()}`;
         window.open(url, 'SimBrief', 'width=1200,height=800');
 
         setFlightPlan({

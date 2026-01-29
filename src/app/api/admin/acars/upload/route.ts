@@ -60,32 +60,44 @@ export async function POST(request: NextRequest) {
 
         // Send Discord Announcement
         try {
-            const webhookUrl = discordWebhooks.acarsRelease; // Using dedicated release channel
+            const webhookUrl = discordWebhooks.acarsRelease;
+            const downloadUrl = 'https://test.levant-va.com/portal/downloads';
+            
             const embed = {
-                title: `🚀 New ACARS Release: v${version}`,
-                description: `A new version of the **${type === 'exe' ? 'ACARS Tracker' : 'X-Plane Plugin'}** is now available for download.`,
+                title: `✨ New Update Available: ACARS v${version}`,
+                description: `**A new version of the Levant ACARS Tracker is live!**\n\nUpgrade now to access the latest features, fixes, and performance improvements for the best flight experience.`,
                 color: 0xD4AF37, // Gold
+                thumbnail: {
+                    url: 'https://test.levant-va.com/img/logo.png' 
+                },
                 fields: [
-                    { name: 'Version', value: `v${version}`, inline: true },
-                    { name: 'Type', value: type.toUpperCase(), inline: true },
-                    { name: 'File Size', value: size, inline: true }
+                    { name: '📦 Version', value: `\`v${version}\``, inline: true },
+                    { name: '🔧 Type', value: `\`${type.toUpperCase()}\``, inline: true },
+                    { name: '💾 Size', value: `\`${size}\``, inline: true }
                 ] as any[],
+                image: {
+                    url: 'https://test.levant-va.com/img/hero-img.png' // Optional: Generic nice banner
+                },
                 timestamp: new Date().toISOString(),
-                footer: { text: 'Levant Virtual Airline | Operations' }
+                footer: { text: 'Levant Virtual Airline | Engineering Team', icon_url: 'https://test.levant-va.com/img/logo.png' }
             };
 
             if (notes) {
-                embed.fields.push({ name: 'Update Notes', value: notes, inline: false });
+                embed.fields.push({ name: '📝 What\'s New', value: `>>> ${notes}`, inline: false });
             }
 
-            embed.fields.push({ name: 'Download', value: `[Link to Downloads Page](https://levant-va.com/portal/downloads)`, inline: false });
+            embed.fields.push({ 
+                name: '⬇️ Download Now', 
+                value: `[**Click here to Download via Portal**](${downloadUrl})`, 
+                inline: false 
+            });
 
             await fetch(webhookUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    username: 'Levant Operations',
-                    avatar_url: 'https://levant-va.com/logo.png',
+                    username: 'Levant System',
+                    avatar_url: 'https://test.levant-va.com/img/logo.png',
                     embeds: [embed]
                 })
             });
