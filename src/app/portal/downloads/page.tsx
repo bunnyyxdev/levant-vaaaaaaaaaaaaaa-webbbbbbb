@@ -37,22 +37,6 @@ export default function DownloadsPage() {
             icon: <Monitor className="w-5 h-5 text-blue-400" />,
             url: '#'
         },
-        {
-            name: 'Windows Portable',
-            type: 'zip',
-            size: '82 MB',
-            desc: 'Standalone executable. No installation required.',
-            icon: <Archive className="w-5 h-5 text-yellow-400" />,
-            url: '#'
-        },
-        {
-            name: 'User Manual',
-            type: 'pdf',
-            size: '2.5 MB',
-            desc: 'Comprehensive guide to installing and using the tracker.',
-            icon: <BookOpen className="w-5 h-5 text-gray-400" />,
-            url: '#'
-        },
     ];
 
     return (
