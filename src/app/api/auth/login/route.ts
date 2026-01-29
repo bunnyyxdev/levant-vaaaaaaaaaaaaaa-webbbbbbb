@@ -89,9 +89,9 @@ export async function POST(request: NextRequest) {
         // Set Cookie
         response.cookies.set('auth_token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production' && !request.url.includes('localhost'),
-            sameSite: 'lax', // Use lax for better session persistence during redirects
-            maxAge: 60 * 60 * 24, // 24 hours
+            secure: true, // Always use secure in production/Vercel
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 7, // Extend to 7 days for "one-time" login feel
             path: '/',
         });
 

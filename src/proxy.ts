@@ -42,9 +42,9 @@ export async function proxy(request: NextRequest) {
             }
 
         } catch (error) {
-            // Token invalid - clear it and redirect to login if on protected route
+            // Token invalid - clear it and redirect to home if on protected route
             const response = pathname.startsWith('/portal')
-                ? NextResponse.redirect(new URL('/login', request.url))
+                ? NextResponse.redirect(new URL('/', request.url))
                 : NextResponse.next();
             response.cookies.delete('auth_token');
             return response;
@@ -52,7 +52,7 @@ export async function proxy(request: NextRequest) {
     } else {
         // Protected routes check
         if (pathname.startsWith('/portal')) {
-            return NextResponse.redirect(new URL('/login', request.url));
+            return NextResponse.redirect(new URL('/', request.url));
         }
     }
 
