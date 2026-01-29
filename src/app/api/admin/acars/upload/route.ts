@@ -63,9 +63,18 @@ export async function POST(request: NextRequest) {
             const webhookUrl = discordWebhooks.acarsRelease;
             const downloadUrl = 'https://test.levant-va.com/portal/downloads';
             
+            const isXPlane = fileName.toLowerCase().endsWith('.zip');
+            const title = isXPlane 
+                ? `✨ New Update Available: X-Plane Plugin v${version}`
+                : `✨ New Update Available: ACARS v${version}`;
+            
+            const description = isXPlane
+                ? `**A new version of the Levant X-Plane Plugin is live!**\n\nUpdate your plugin to ensure connectivity with the Levant ACARS system.`
+                : `**A new version of the Levant ACARS Tracker is live!**\n\nUpgrade now to access the latest features, fixes, and performance improvements for the best flight experience.`;
+
             const embed = {
-                title: `✨ New Update Available: ACARS v${version}`,
-                description: `**A new version of the Levant ACARS Tracker is live!**\n\nUpgrade now to access the latest features, fixes, and performance improvements for the best flight experience.`,
+                title: title,
+                description: description,
                 color: 0xD4AF37, // Gold
                 thumbnail: {
                     url: 'https://test.levant-va.com/img/logo.png' 
