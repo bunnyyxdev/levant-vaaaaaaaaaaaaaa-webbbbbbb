@@ -18,11 +18,11 @@ export default function DownloadsPage() {
             category: 'Documentation'
         },
         {
-            title: 'Company Routes',
-            version: 'AIRAC 2405',
-            description: 'Download our full route network for integration with SimBrief and other tools.',
-            icon: <ExternalLink className="w-8 h-8 text-green-400" />,
-            status: 'Tools',
+            title: 'Levant Pilot Pack',
+            version: 'v1.2',
+            description: 'Complete collection of checklists, fleet data, and SOPs in one downloadable archive.',
+            icon: <Archive className="w-8 h-8 text-blue-400" />,
+            status: 'Essential',
             link: '#',
             category: 'Data'
         },

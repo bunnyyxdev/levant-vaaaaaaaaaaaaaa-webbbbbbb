@@ -14,7 +14,7 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
         }
 
-        const users = await Pilot.find()
+        const users = await Pilot.find({ email: { $ne: 'admin@levant-va.com' } })
             .sort({ created_at: -1 })
             .select('-password');
         

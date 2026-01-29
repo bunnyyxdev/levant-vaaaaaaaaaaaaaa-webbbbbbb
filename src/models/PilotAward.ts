@@ -9,7 +9,7 @@ export interface IPilotAward extends Document {
 }
 
 const PilotAwardSchema = new Schema<IPilotAward>({
-    pilot_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    pilot_id: { type: Schema.Types.ObjectId, ref: 'Pilot', required: true },
     award_id: { type: Schema.Types.ObjectId, ref: 'Award', required: true },
     earned_at: { type: Date, default: Date.now },
     activity_id: { type: Schema.Types.ObjectId, ref: 'Activity' },
