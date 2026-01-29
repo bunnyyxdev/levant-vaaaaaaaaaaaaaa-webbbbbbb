@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 import { jwtSecret } from './config/config';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const { pathname, hostname } = request.nextUrl;
     const rawToken = request.cookies.get('auth_token')?.value;
     const token = rawToken?.trim();
@@ -45,8 +45,8 @@ export async function middleware(request: NextRequest) {
             console.error('Middleware: Verification FAILED:', errorMsg);
             
             if (pathname.startsWith('/portal')) {
-                console.log('Middleware: Access to protected route denied. Redirecting Home.');
-                const response = NextResponse.redirect(new URL('/', request.url));
+                console.log('Middleware: Access to protected route denied. Redirecting to Login.');
+                const response = NextResponse.redirect(new URL('/login', request.url));
                 response.cookies.set('auth_token', '', { path: '/', maxAge: 0 });
                 return response;
             }
@@ -54,8 +54,8 @@ export async function middleware(request: NextRequest) {
     } else {
         // Protected routes check
         if (pathname.startsWith('/portal')) {
-            console.log('Middleware: No token found for portal route. Redirecting Home.');
-            return NextResponse.redirect(new URL('/', request.url));
+            console.log('Middleware: No token found for portal route. Redirecting to Login.');
+            return NextResponse.redirect(new URL('/login', request.url));
         }
     }
 

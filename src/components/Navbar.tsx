@@ -11,7 +11,7 @@ export default function Navbar() {
         { name: 'Map', href: '#map' },
         { name: 'Partners', href: '#partners' },
         { name: 'Social', href: '#community' },
-        { name: 'Pilot Portal', href: '/portal/dashboard' },
+        { name: 'Pilot Portal', href: '/login' },
     ];
 
     return (

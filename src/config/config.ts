@@ -1,9 +1,9 @@
 // JWT Secret for authentication
-export const jwtSecret = 'jjwds9AU(@UEJ@IEAJEAEADA@HEBWDkz'; // Change this to a secure random string
+export const jwtSecret = '3876963d1d10dae6d6abc075fdc22046353ee8165ec095fc17a7c8fd25026336';
 
 // MongoDB Configuration
 export const mongoConfig = {
-    uri: process.env.MONGODB_URI || 'mongodb+srv://sugarbunnystores_db_user:Ryyoq9WDILhd4rvn@cluster0.3tivyqi.mongodb.net/levant_virtual?retryWrites=true&w=majority',
+    uri: 'mongodb+srv://sugarbunnystores_db_user:Ryyoq9WDILhd4rvn@cluster0.3tivyqi.mongodb.net/levant_virtual?retryWrites=true&w=majority',
     options: {
         // Mongoose 6+ no longer needs these, but keeping for reference
     }
