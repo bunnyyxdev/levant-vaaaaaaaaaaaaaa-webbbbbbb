@@ -6,7 +6,7 @@ import { jwtSecret, blobToken } from '@/config/config';
 
 async function isAdmin() {
     const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const token = cookieStore.get('lva_session')?.value;
     if (!token) return false;
 
     try {

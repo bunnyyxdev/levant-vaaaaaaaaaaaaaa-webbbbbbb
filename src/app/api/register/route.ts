@@ -3,10 +3,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/mongodb';
 import Pilot from '@/models/Pilot';
-import Counter from '@/models/Counter';
-import QuizAttempt from '@/models/QuizAttempt';
-import { QUIZ_COOLDOWN_MS } from '@/config/config';
-import { sendPendingActivationEmail } from '@/lib/email';
+import { sendAccountActivatedEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
     try {
@@ -44,32 +41,29 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check quiz cooldown if enabled
-        if (QUIZ_COOLDOWN_MS > 0) {
-            const attempt = await QuizAttempt.findOne({ email: email.toLowerCase() });
-            if (attempt) {
-                const cooldownEnd = new Date(attempt.last_attempt_at.getTime() + QUIZ_COOLDOWN_MS);
-                if (new Date() < cooldownEnd) {
-                    return NextResponse.json(
-                        { error: 'Please wait before trying again', cooldownEnd },
-                        { status: 429 }
-                    );
-                }
-            }
+        // Check if callsign is already taken as a pilot ID
+        const callsign = desiredCallsign?.trim().toUpperCase();
+        if (!callsign) {
+            return NextResponse.json(
+                { error: 'Callsign is required' },
+                { status: 400 }
+            );
         }
 
-        // Generate sequential pilot ID using Counter
-        const counter = await Counter.findOneAndUpdate(
-            { _id: 'pilot_id' },
-            { $inc: { seq: 1 } },
-            { upsert: true, new: true }
-        );
-        const pilotId = `LVT${String(counter.seq).padStart(4, '0')}`;
+        const existingCallsign = await Pilot.findOne({ pilot_id: callsign });
+        if (existingCallsign) {
+            return NextResponse.json(
+                { error: 'Callsign already in use' },
+                { status: 400 }
+            );
+        }
+
+        const pilotId = callsign;
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create new pilot with Pending status
+        // Create new pilot with Active status (Key System removed)
         const newPilot = await Pilot.create({
             pilot_id: pilotId,
             first_name: firstName,
@@ -82,14 +76,14 @@ export async function POST(request: NextRequest) {
             timezone,
             desired_callsign: desiredCallsign,
             rank: 'Cadet',
-            status: 'Pending', // New accounts require activation
+            status: 'Active', 
             role: 'Pilot',
             is_admin: false,
             current_location: 'OLBA',
         });
 
-        // Send pending activation email
-        await sendPendingActivationEmail(email, pilotId, firstName);
+        // Send activation email
+        await sendAccountActivatedEmail(email, pilotId, firstName);
 
         return NextResponse.json({
             success: true,

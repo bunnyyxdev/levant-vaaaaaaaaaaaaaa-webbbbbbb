@@ -6,7 +6,7 @@ import Pilot from '@/models/Pilot';
 
 export async function GET(request: NextRequest) {
     try {
-        const token = request.cookies.get('auth_token')?.value;
+        const token = request.cookies.get('lva_session')?.value;
 
         if (!token) {
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });

@@ -15,7 +15,7 @@ export interface AuthSession {
  */
 export async function verifyAuth(): Promise<AuthSession> {
     const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const token = cookieStore.get('lva_session')?.value;
 
     if (!token) {
         throw new Error('Unauthorized: No token provided');

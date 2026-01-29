@@ -3,57 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-// Quiz questions with correct and wrong answers
-const quizQuestions = [
-    {
-        id: 1,
-        question: 'What is TORA?',
-        options: [
-            { value: 'A', label: 'Take off Run Available', isCorrect: true },
-            { value: 'B', label: 'Taxi of Run Available', isCorrect: false },
-            { value: 'C', label: 'Take off runway Available', isCorrect: false },
-        ],
-    },
-    {
-        id: 2,
-        question: 'What is TRA and TRL?',
-        options: [
-            { value: 'A', label: 'Transitions Altitude Transitions level', isCorrect: true },
-            { value: 'B', label: 'Transitions Rule Altitude Transitions Rule level', isCorrect: false },
-            { value: 'C', label: 'Terrain Radar Altitude Terrain Radar Level', isCorrect: false },
-        ],
-    },
-    {
-        id: 3,
-        question: 'Where must you be before connecting?',
-        options: [
-            { value: 'A', label: 'On the Runway', isCorrect: false },
-            { value: 'B', label: 'Taxiway', isCorrect: false },
-            { value: 'C', label: 'None of the above', isCorrect: true },
-        ],
-    },
-    {
-        id: 4,
-        question: 'If you want to fly VFR, what is the rule for Semicircle Rules?',
-        options: [
-            { value: 'A', label: 'East odd and west even + 500ft', isCorrect: true },
-            { value: 'B', label: 'West even and east odd + 500ft', isCorrect: false },
-            { value: 'C', label: 'All above are wrong', isCorrect: false },
-        ],
-    },
-    {
-        id: 5,
-        question: 'What is VOR?',
-        options: [
-            { value: 'A', label: 'VHF Omnidirectional Radio Range', isCorrect: true },
-            { value: 'B', label: 'None are correct', isCorrect: false },
-            { value: 'C', label: 'Visual of Range', isCorrect: false },
-        ],
-    },
-];
+// Registration Page - Key System Removed
 
 export default function RegisterPage() {
-    const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -67,11 +19,9 @@ export default function RegisterPage() {
         timezone: '',
         phoneNumber: '',
     });
-    const [answers, setAnswers] = useState<Record<number, string>>({});
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [cooldownUntil, setCooldownUntil] = useState<Date | null>(null);
 
     // Country/Timezone Data State
     const [countriesData, setCountriesData] = useState<any[]>([]);
@@ -168,45 +118,6 @@ export default function RegisterPage() {
         }
     };
 
-    const handleAnswerChange = (questionId: number, value: string) => {
-        setAnswers({
-            ...answers,
-            [questionId]: value,
-        });
-    };
-
-    const handleQuizSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        // Check all questions answered
-        if (Object.keys(answers).length !== quizQuestions.length) {
-            setError('Please answer all quiz questions');
-            setLoading(false);
-            return;
-        }
-
-        // Validate quiz answers
-        const allCorrect = quizQuestions.every((q) => {
-            const selectedAnswer = answers[q.id];
-            const correctOption = q.options.find((opt) => opt.isCorrect);
-            return selectedAnswer === correctOption?.value;
-        });
-
-        if (!allCorrect) {
-            // Failed
-            setError('Incorrect answers. Please try again.');
-            setLoading(false);
-            return;
-        }
-
-        // Quiz passed
-        setStep(2);
-        setLoading(false);
-        window.scrollTo(0, 0);
-    };
-
     const handleRegistrationSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -231,9 +142,6 @@ export default function RegisterPage() {
             if (!response.ok) {
                 if (response.status === 429) {
                     // Cooldown trigger from server
-                    const cooldown = new Date(Date.now() + 24 * 60 * 60 * 1000);
-                    setCooldownUntil(cooldown);
-                    localStorage.setItem('registrationCooldown', cooldown.toISOString());
                 }
                 throw new Error(data.error || 'Registration failed');
             }
@@ -284,21 +192,19 @@ export default function RegisterPage() {
                         </div>
                     </Link>
                     <h1 className="text-2xl md:text-3xl font-display font-bold text-white mb-2">
-                        {step === 1 ? 'Before we start ...' : 'Pilot Registration'}
+                        Pilot Registration
                     </h1>
                     <p className="text-gray-400 text-sm">
-                        {step === 1
-                            ? 'Let us get you familiar with our virtual sky'
-                            : 'Complete your profile to finish registration'}
+                        Complete your profile to finish registration
                     </p>
                 </div>
 
                 <div className="glass-card p-8 relative overflow-hidden transition-all duration-500">
-                    {/* Progress Bar */}
+                    {/* Progress Bar (Removed) */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-dark-700">
                         <div
                             className="h-full bg-accent-gold transition-all duration-500"
-                            style={{ width: step === 1 ? '50%' : '100%' }}
+                            style={{ width: '100%' }}
                         />
                     </div>
 
@@ -308,233 +214,184 @@ export default function RegisterPage() {
                         </div>
                     )}
 
-                    {step === 1 ? (
-                        /* Step 1: Quiz */
-                        <form onSubmit={handleQuizSubmit} className="mt-4">
-                            <div className="mb-8">
-                                <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                                    <span className="w-8 h-8 bg-accent-gold/20 rounded-lg flex items-center justify-center mr-3 text-accent-gold text-sm">1</span>
-                                    Quiz Questions
-                                </h2>
-                                <p className="text-gray-400 text-sm mb-6">
-                                    Please answer all questions correctly.
-                                </p>
-
-                                <div className="space-y-6">
-                                    {quizQuestions.map((q, index) => (
-                                        <div key={q.id} className="bg-dark-700/50 rounded-lg p-4">
-                                            <label className="block text-white font-medium mb-3">
-                                                Q{index + 1}) {q.question}
-                                            </label>
-                                            <select
-                                                value={answers[q.id] || ''}
-                                                onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                                                required
-                                                className="w-full bg-dark-600 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                            >
-                                                <option value="">Select an answer</option>
-                                                {q.options.map((opt) => (
-                                                    <option key={opt.value} value={opt.value}>
-                                                        ({opt.value}) {opt.label}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    ))}
+                    <form onSubmit={handleRegistrationSubmit} className="mt-4">
+                        <div className="mb-8">
+                            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                                Personal Information
+                            </h2>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-gray-400 text-sm mb-2">First Name</label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={formData.firstName}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                                    />
                                 </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full btn-primary py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading ? 'Verifying Answers...' : 'Verify & Continue'}
-                            </button>
-                        </form>
-                    ) : (
-                        /* Step 2: Registration Form */
-                        <form onSubmit={handleRegistrationSubmit} className="mt-4">
-                            <div className="mb-8">
-                                <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
-                                    <span className="w-8 h-8 bg-accent-gold/20 rounded-lg flex items-center justify-center mr-3 text-accent-gold text-sm">2</span>
-                                    Personal Information
-                                </h2>
-                                <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-gray-400 text-sm mb-2">Last Name</label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={formData.lastName}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-400 text-sm mb-2">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        name="phoneNumber"
+                                        value={formData.phoneNumber}
+                                        onChange={handleInputChange}
+                                        required
+                                        placeholder="e.g. +961 70 123 456"
+                                        pattern="^\+[0-9]{1,3}[0-9\s]{6,}$"
+                                        title="Please enter a valid phone number with country code (e.g. +1 555 123 4567)"
+                                        className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-400 text-sm mb-2">Email</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-400 text-sm mb-2">Desired Callsign</label>
+                                    <input
+                                        type="text"
+                                        name="desiredCallsign"
+                                        value={formData.desiredCallsign}
+                                        onChange={handleInputChange}
+                                        required
+                                        placeholder="e.g. LVT123"
+                                        className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-400 text-sm mb-2">IVAO ID (Optional)</label>
+                                    <input
+                                        type="text"
+                                        name="ivaoId"
+                                        value={formData.ivaoId}
+                                        onChange={handleInputChange}
+                                        className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-400 text-sm mb-2">Password</label>
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        required
+                                        minLength={8}
+                                        className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-400 text-sm mb-2">Confirm Password</label>
+                                    <input
+                                        type="password"
+                                        name="confirmPassword"
+                                        value={formData.confirmPassword}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                                    />
+                                </div>
+                                <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-gray-400 text-sm mb-2">First Name</label>
-                                        <input
-                                            type="text"
-                                            name="firstName"
-                                            value={formData.firstName}
+                                        <label className="block text-gray-400 text-sm mb-2">Country</label>
+                                        <select
+                                            name="country"
+                                            value={formData.country}
                                             onChange={handleInputChange}
                                             required
+                                            disabled={loadingCountries}
                                             className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                        />
+                                        >
+                                            <option value="">{loadingCountries ? 'Loading...' : 'Select your country'}</option>
+                                            {countriesData.map((c) => (
+                                                <option key={c.name.common} value={c.name.common}>
+                                                    {c.name.common}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div>
-                                        <label className="block text-gray-400 text-sm mb-2">Last Name</label>
-                                        <input
-                                            type="text"
-                                            name="lastName"
-                                            value={formData.lastName}
+                                        <label className="block text-gray-400 text-sm mb-2">Timezone</label>
+                                        <select
+                                            name="timezone"
+                                            value={formData.timezone}
                                             onChange={handleInputChange}
                                             required
+                                            disabled={!formData.country}
                                             className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                        />
+                                        >
+                                            <option value="">Select Timezone</option>
+                                            {availableTimezones.map((tz) => (
+                                                <option key={tz} value={tz}>
+                                                    {tz}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
-                                    <div>
-                                        <label className="block text-gray-400 text-sm mb-2">Phone Number</label>
-                                        <input
-                                            type="tel"
-                                            name="phoneNumber"
-                                            value={formData.phoneNumber}
-                                            onChange={handleInputChange}
-                                            required
-                                            placeholder="e.g. +961 70 123 456"
-                                            pattern="^\+[0-9]{1,3}[0-9\s]{6,}$"
-                                            title="Please enter a valid phone number with country code (e.g. +1 555 123 4567)"
-                                            className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-400 text-sm mb-2">Email</label>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            value={formData.email}
-                                            onChange={handleInputChange}
-                                            required
-                                            className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-400 text-sm mb-2">Desired Callsign</label>
-                                        <input
-                                            type="text"
-                                            name="desiredCallsign"
-                                            value={formData.desiredCallsign}
-                                            onChange={handleInputChange}
-                                            required
-                                            placeholder="e.g. LVT123"
-                                            className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-400 text-sm mb-2">IVAO ID (Optional)</label>
-                                        <input
-                                            type="text"
-                                            name="ivaoId"
-                                            value={formData.ivaoId}
-                                            onChange={handleInputChange}
-                                            className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-400 text-sm mb-2">Password</label>
-                                        <input
-                                            type="password"
-                                            name="password"
-                                            value={formData.password}
-                                            onChange={handleInputChange}
-                                            required
-                                            minLength={8}
-                                            className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-gray-400 text-sm mb-2">Confirm Password</label>
-                                        <input
-                                            type="password"
-                                            name="confirmPassword"
-                                            value={formData.confirmPassword}
-                                            onChange={handleInputChange}
-                                            required
-                                            className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                        />
-                                    </div>
-                                    <div className="md:col-span-2 grid md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-gray-400 text-sm mb-2">Country</label>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-gray-400 text-sm mb-2">City</label>
+                                        {availableCities.length > 0 ? (
                                             <select
-                                                name="country"
-                                                value={formData.country}
+                                                name="city"
+                                                value={formData.city}
                                                 onChange={handleInputChange}
                                                 required
-                                                disabled={loadingCountries}
+                                                disabled={loadingCities || !formData.country}
                                                 className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
                                             >
-                                                <option value="">{loadingCountries ? 'Loading...' : 'Select your country'}</option>
-                                                {countriesData.map((c) => (
-                                                    <option key={c.name.common} value={c.name.common}>
-                                                        {c.name.common}
+                                                <option value="">{loadingCities ? 'Loading Cities...' : 'Select City'}</option>
+                                                {availableCities.map((city) => (
+                                                    <option key={city} value={city}>
+                                                        {city}
                                                     </option>
                                                 ))}
                                             </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-400 text-sm mb-2">Timezone</label>
-                                            <select
-                                                name="timezone"
-                                                value={formData.timezone}
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                name="city"
+                                                value={formData.city}
                                                 onChange={handleInputChange}
                                                 required
-                                                disabled={!formData.country}
+                                                placeholder={loadingCities ? "Loading cities..." : "Enter city name"}
+                                                disabled={loadingCities}
                                                 className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                            >
-                                                <option value="">Select Timezone</option>
-                                                {availableTimezones.map((tz) => (
-                                                    <option key={tz} value={tz}>
-                                                        {tz}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <label className="block text-gray-400 text-sm mb-2">City</label>
-                                            {availableCities.length > 0 ? (
-                                                <select
-                                                    name="city"
-                                                    value={formData.city}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    disabled={loadingCities || !formData.country}
-                                                    className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                                >
-                                                    <option value="">{loadingCities ? 'Loading Cities...' : 'Select City'}</option>
-                                                    {availableCities.map((city) => (
-                                                        <option key={city} value={city}>
-                                                            {city}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            ) : (
-                                                <input
-                                                    type="text"
-                                                    name="city"
-                                                    value={formData.city}
-                                                    onChange={handleInputChange}
-                                                    required
-                                                    placeholder={loadingCities ? "Loading cities..." : "Enter city name"}
-                                                    disabled={loadingCities}
-                                                    className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
-                                                />
-                                            )}
-                                        </div>
+                                            />
+                                        )}
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full btn-primary py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading ? 'Creating Account...' : 'Complete Registration'}
-                            </button>
-                        </form>
-                    )}
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full btn-primary py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {loading ? 'Creating Account...' : 'Complete Registration'}
+                        </button>
+                    </form>
 
                     <p className="text-center text-gray-500 text-sm mt-6">
                         Already have an account?{' '}

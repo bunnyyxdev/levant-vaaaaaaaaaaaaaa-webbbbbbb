@@ -4,7 +4,7 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(new URL('/', request.url));
     
     // Clear the auth cookie
-    response.cookies.set('auth_token', '', {
+    response.cookies.set('lva_session', '', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

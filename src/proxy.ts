@@ -5,11 +5,8 @@ import { jwtSecret } from './config/config';
 
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const rawToken = request.cookies.get('auth_token')?.value;
-    const token = rawToken?.trim();
-
+    
     // 1. Skip checks for static assets and public APIs
-    // Using a more comprehensive regex for static assets
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api/') || 
@@ -19,6 +16,14 @@ export async function proxy(request: NextRequest) {
         /\.(ico|png|jpg|jpeg|svg|css|js|woff2?|webp|mp4|json)$/i.test(pathname)
     ) {
         return NextResponse.next();
+    }
+
+    const rawToken = request.cookies.get('lva_session')?.value;
+    let token = rawToken?.trim();
+
+    // Fix for potential quote wrapping in some environments
+    if (token && token.startsWith('"') && token.endsWith('"')) {
+        token = token.slice(1, -1);
     }
 
     if (token) {
@@ -31,27 +36,34 @@ export async function proxy(request: NextRequest) {
                 return NextResponse.rewrite(new URL('/404', request.url));
             }
 
+            // Advanced Function: Admin Route Protection
+            if (pathname.startsWith('/portal/admin')) {
+                const isAdmin = payload.isAdmin === true || payload.role === 'Admin';
+                if (!isAdmin) {
+                    // Redirect non-admins away from admin pages
+                    return NextResponse.redirect(new URL('/portal/dashboard', request.url));
+                }
+            }
+
             // If we are at /login but have a valid token, go to portal
             if (pathname === '/login') {
                 return NextResponse.redirect(new URL('/portal/dashboard', request.url));
             }
 
         } catch (error: any) {
-            // Only log actual verification errors if they are not common expired/invalid cases
-            // Or just clear the cookie silently if it's a portal route
-            
+            // Token invalid or expired
             if (pathname.startsWith('/portal')) {
                 const response = NextResponse.redirect(new URL('/login', request.url));
-                response.cookies.set('auth_token', '', { path: '/', maxAge: 0 });
+                response.cookies.set('lva_session', '', { path: '/', maxAge: 0 });
                 return response;
             }
 
             const response = NextResponse.next();
-            response.cookies.set('auth_token', '', { path: '/', maxAge: 0 });
+            response.cookies.set('lva_session', '', { path: '/', maxAge: 0 });
             return response;
         }
     } else {
-        // Protected routes check
+        // No token, check if route is protected
         if (pathname.startsWith('/portal')) {
             return NextResponse.redirect(new URL('/login', request.url));
         }
@@ -63,14 +75,5 @@ export async function proxy(request: NextRequest) {
 export default proxy;
 
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - img (public images)
-         */
-        '/((?!_next/static|_next/image|favicon.ico|img).*)',
-    ],
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|img).*)'],
 };

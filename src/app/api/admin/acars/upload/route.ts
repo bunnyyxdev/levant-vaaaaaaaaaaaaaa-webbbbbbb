@@ -12,7 +12,7 @@ import { put } from '@vercel/blob';
 
 async function isAdmin(request: NextRequest) {
     const cookieStore = await cookies();
-    const token = cookieStore.get('auth_token')?.value;
+    const token = cookieStore.get('lva_session')?.value;
     if (!token) return false;
 
     try {

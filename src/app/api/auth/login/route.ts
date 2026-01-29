@@ -99,9 +99,9 @@ export async function POST(request: NextRequest) {
         });
 
         // Set Cookie
-        response.cookies.set('auth_token', token, {
+        response.cookies.set('lva_session', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Only secure in production
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             maxAge: 60 * 60 * 24 * 7, 
             path: '/',
