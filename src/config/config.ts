@@ -62,5 +62,8 @@ export const discordWebhooks = {
     errorLog: 'https://discord.com/api/webhooks/1331665427138379897/T-Ie9F-6e_6hE-Uv8M-Uj8uY_5-6U-9u6E_6hE-Uv8M-Uj8uY_5-6U-9u'
 };
 
+// Base URL for Email Links
+export const baseUrl = 'https://test.levant-va.com';
+
 // Vercel Blob Storage
 export const blobToken = 'vercel_blob_rw_KgJ0MeTSu6RWtGbD_QvsKzKg38BTlUONttYk3SNp5kk1BNS';

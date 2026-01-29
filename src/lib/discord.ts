@@ -29,7 +29,7 @@ export async function sendDiscordNotification(content: string, embeds?: DiscordE
                 content,
                 embeds,
                 username: 'Levant Systems',
-                avatar_url: 'https://test.levant-va.com/img/logo.png'
+                avatar_url: 'https://levant-va.com/img/logo.png'
             }),
         });
 
@@ -48,7 +48,7 @@ export async function notifyRankPromotion(pilotName: string, pilotId: string, ra
             description: `**${pilotName} | ${pilotId}**, you just unlocked the achievement: **Promoted to ${rankName}!** 🎉`,
             color: 0xD4AF37, // Gold
             thumbnail: {
-                url: rankImageUrl || 'https://test.levant-va.com/img/awards/promotion.png'
+                url: rankImageUrl || 'https://levant-va.com/img/awards/promotion.png'
             },
             fields: [
                 {
@@ -64,7 +64,7 @@ export async function notifyRankPromotion(pilotName: string, pilotId: string, ra
             ],
             footer: {
                 text: 'Levant Virtual Airline • Professional Aviation',
-                icon_url: 'https://test.levant-va.com/img/logo.png'
+                icon_url: 'https://levant-va.com/img/logo.png'
             },
             timestamp: new Date().toISOString()
         }

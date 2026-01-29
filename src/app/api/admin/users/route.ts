@@ -56,7 +56,6 @@ export async function PUT(request: NextRequest) {
         }
 
         const body = await request.json();
-        console.log('Received user update request:', body); // Debugging
         const { userId, ...updates } = body;
 
         if (!userId) {

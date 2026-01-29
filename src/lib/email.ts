@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { smtpConfig } from '../config/config';
+import { smtpConfig, baseUrl } from '../config/config';
 
 const transporter = nodemailer.createTransport({
     host: smtpConfig.host,
@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
 
 // Password Reset Email
 export const sendPasswordResetEmail = async (to: string, token: string) => {
-    const baseUrl = 'https://levant-va.com';
     const resetLink = `${baseUrl}/reset-password?token=${token}`;
 
     const mailOptions = {
@@ -77,7 +76,6 @@ export const sendPendingActivationEmail = async (to: string, pilotId: string, fi
 
 // Account Activated Email
 export const sendAccountActivatedEmail = async (to: string, pilotId: string, firstName: string) => {
-    const baseUrl = 'https://levant-va.com';
     const loginLink = `${baseUrl}/login`;
 
     const mailOptions = {
@@ -118,7 +116,6 @@ export const sendAccountActivatedEmail = async (to: string, pilotId: string, fir
 
 // Account Inactive Warning Email (14 Days)
 export const sendInactivityReminderEmail = async (to: string, pilotId: string, firstName: string) => {
-    const baseUrl = 'https://levant-va.com';
     const loginLink = `${baseUrl}/login`;
 
     const mailOptions = {
@@ -154,7 +151,6 @@ export const sendInactivityReminderEmail = async (to: string, pilotId: string, f
 
 // Account Inactive Notice (30 Days)
 export const sendAccountInactiveEmail = async (to: string, pilotId: string, firstName: string) => {
-    const baseUrl = 'https://levant-va.com';
     const loginLink = `${baseUrl}/login`;
 
     const mailOptions = {

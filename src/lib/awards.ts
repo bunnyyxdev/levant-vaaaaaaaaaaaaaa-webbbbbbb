@@ -58,7 +58,7 @@ export async function checkAndGrantAwards(pilotInternalId: string) {
                             description: `**${pilot.first_name} ${pilot.last_name} | ${pilot.pilot_id}** has earned the **${award.name}** award!`,
                             color: 0x3498DB, // Blue
                             thumbnail: {
-                                url: award.imageUrl || 'https://test.levant-va.com/img/awards/default.png'
+                                url: award.imageUrl || 'https://levant-va.com/img/awards/default.png'
                             },
                             fields: [
                                 { name: 'Category', value: award.category || 'Special', inline: true },

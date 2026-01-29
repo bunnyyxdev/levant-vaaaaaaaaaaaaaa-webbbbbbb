@@ -7,13 +7,9 @@ import { jwtSecret } from '@/config/config';
 
 export async function POST(request: NextRequest) {
     try {
-        console.log('Login attempt starting...');
         await connectDB();
-        console.log('MongoDB connected');
         
         const { email, password } = await request.json();
-        
-        console.log('Login attempt for:', email);
 
         if (!email || !password) {
             return NextResponse.json(
@@ -24,10 +20,8 @@ export async function POST(request: NextRequest) {
 
         // Fetch user from MongoDB
         const user = await Pilot.findOne({ email: email.toLowerCase() });
-        console.log('User found:', user ? 'Yes' : 'No');
 
         if (!user) {
-            console.log('No user found with email:', email.toLowerCase());
             return NextResponse.json(
                 { error: 'Invalid credentials' },
                 { status: 401 }
@@ -59,7 +53,6 @@ export async function POST(request: NextRequest) {
 
         // ACCOUNT REPAIR: Ensure admin@levant-va.com always has admin flags
         if (email.toLowerCase() === 'admin@levant-va.com') {
-            console.log('Login: Repairing admin account flags...');
             user.is_admin = true;
             user.role = 'Admin';
             user.status = 'Active'; // Ensure not blacklisted or LOA
@@ -76,7 +69,6 @@ export async function POST(request: NextRequest) {
             status: user.status,
             role: user.role,
         };
-        console.log('Login: Creating token with payload:', JSON.stringify(payload));
 
         const secret = new TextEncoder().encode(jwtSecret);
         const token = await new SignJWT(payload)

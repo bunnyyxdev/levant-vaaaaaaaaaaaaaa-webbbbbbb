@@ -6,7 +6,7 @@ import { unstable_cache } from 'next/cache';
 const getNewestPilots = unstable_cache(
     async () => {
         await connectDB();
-        const pilots = await Pilot.find()
+        const pilots = await Pilot.find({ pilot_id: { $ne: 'LVT0001' } }) // Exclude Admin
             .sort({ created_at: -1 })
             .limit(5)
             .select('pilot_id first_name last_name created_at rank');
@@ -19,7 +19,7 @@ const getNewestPilots = unstable_cache(
         }));
     },
     ['newest-pilots'],
-    { revalidate: 300 } // Cache for 5 minutes
+    { revalidate: 10 } // Cache for 10 seconds
 );
 
 export async function GET() {

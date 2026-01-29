@@ -135,97 +135,137 @@ export default function AdminUsersPage() {
         };
     }, [users]);
 
+    const getInitials = (firstName: string, lastName: string) => {
+        return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="text-accent-gold animate-pulse text-lg font-medium">Loading Users...</div>
+                <div className="text-accent-gold animate-pulse text-lg font-medium flex items-center gap-2">
+                    <Users className="animate-bounce" /> Loading Members...
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-                <h1 className="text-2xl font-bold text-white flex items-center">
-                    <Users className="w-6 h-6 mr-3 text-accent-gold" />
-                    User Management
-                </h1>
-                <div className="flex gap-4 text-sm flex-wrap">
-                    <span className="flex items-center text-green-400">
-                        <UserCheck className="w-4 h-4 mr-1" /> Active: {stats.active}
-                    </span>
-                    <span className="flex items-center text-blue-400">
-                        <AlertTriangle className="w-4 h-4 mr-1" /> Pending: {stats.pending}
-                    </span>
-                    <span className="flex items-center text-yellow-400">
-                        <AlertTriangle className="w-4 h-4 mr-1" /> Inactive: {stats.inactive}
-                    </span>
-                    <span className="flex items-center text-gray-400">
-                        <AlertTriangle className="w-4 h-4 mr-1" /> LOA: {stats.loa}
-                    </span>
-                    <span className="flex items-center text-red-400">
-                        <UserX className="w-4 h-4 mr-1" /> Blacklisted: {stats.blacklisted}
-                    </span>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Header & Stats */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-display font-bold text-white tracking-tight flex items-center gap-3">
+                        <Users className="w-8 h-8 text-accent-gold" />
+                        Member Management
+                    </h1>
+                    <p className="text-gray-400 mt-1 font-mono text-sm">Manage pilots, permissions, and account status.</p>
+                </div>
+                
+                <div className="flex gap-2 bg-dark-800/50 p-1 rounded-xl border border-white/5 backdrop-blur-sm">
+                    {['Active', 'Pending', 'Inactive'].map((stat) => (
+                        <div key={stat} className="px-4 py-2 rounded-lg bg-white/5 border border-white/5 flex flex-col items-center min-w-[80px]">
+                            <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">{stat}</span>
+                            <span className={`text-xl font-bold ${
+                                stat === 'Active' ? 'text-green-400' : 
+                                stat === 'Pending' ? 'text-blue-400' : 'text-yellow-400'
+                            }`}>
+                                {stat === 'Active' ? stats.active : stat === 'Pending' ? stats.pending : stats.inactive}
+                            </span>
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="glass-card p-4">
-                <input
-                    type="text"
-                    placeholder="Search by Pilot ID, Name, or Email..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full bg-dark-700 border border-white/10 rounded px-4 py-2 text-white outline-none focus:border-accent-gold"
-                />
+            {/* Search & Filters */}
+            <div className="glass-card p-2 flex items-center gap-4 sticky top-4 z-20 backdrop-blur-xl bg-dark-900/80 border-white/10 shadow-2xl">
+                <div className="relative flex-1">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Users size={18} />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search pilots by ID, Name, or Email..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        className="w-full bg-dark-800 border-none rounded-lg py-3 pl-10 pr-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-accent-gold/50 transition-all"
+                    />
+                </div>
+                <div className="hidden md:flex gap-2">
+                   {/* Future filters could go here */}
+                </div>
             </div>
 
-            <div className="glass-card overflow-x-auto">
-                <table className="w-full">
-                    <thead>
-                        <tr className="text-left text-gray-500 text-sm border-b border-white/5 whitespace-nowrap">
-                            <th className="p-4">Pilot ID</th>
-                            <th className="p-4">Name</th>
-                            <th className="p-4">Email</th>
-                            <th className="p-4">Role</th>
-                            <th className="p-4">Status</th>
-                            <th className="p-4">Hours</th>
-                            <th className="p-4">Flights</th>
-                            <th className="p-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredUsers.map(user => (
-                            <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors whitespace-nowrap">
-                                <td className="p-4 text-accent-gold font-mono font-semibold">{user.pilotId}</td>
-                                <td className="p-4 text-white">{user.firstName} {user.lastName}</td>
-                                <td className="p-4 text-gray-400">{user.email}</td>
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${roleColors[user.role] || 'bg-gray-500/20 text-gray-400'}`}>
-                                        {user.role}
-                                    </span>
-                                </td>
-                                <td className="p-4">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${statusColors[user.status] || 'bg-gray-500/20 text-gray-400'}`}>
+            {/* Users Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredUsers.map(user => (
+                    <div key={user.id} className="glass-card group relative overflow-hidden transition-all hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] hover:border-accent-gold/30">
+                        {/* Rank Stripe */}
+                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent-gold to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
+                        
+                        <div className="p-6">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-dark-700 to-dark-800 border border-white/10 flex items-center justify-center text-lg font-bold text-gray-300 shadow-inner">
+                                        {getInitials(user.firstName, user.lastName)}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-white group-hover:text-accent-gold transition-colors">{user.firstName} {user.lastName}</h3>
+                                        <div className="flex items-center gap-2 text-xs font-mono text-gray-500">
+                                            <span className="text-accent-gold">{user.pilotId}</span>
+                                            <span>•</span>
+                                            <span>{user.rank}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => openEditModal(user)}
+                                    className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                    title="Edit User"
+                                >
+                                    <Shield size={16} />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 mb-4">
+                                <div className="bg-dark-900/50 rounded-lg p-2 border border-white/5">
+                                    <div className="text-[10px] uppercase text-gray-500 font-bold mb-1">Status</div>
+                                    <div className={`text-xs font-bold px-2 py-0.5 rounded inline-block ${statusColors[user.status] || 'bg-gray-700 text-gray-400'}`}>
                                         {user.status}
-                                    </span>
-                                </td>
-                                <td className="p-4 text-gray-400">{user.totalHours?.toFixed(1) || 0}</td>
-                                <td className="p-4 text-gray-400">{user.totalFlights || 0}</td>
-                                <td className="p-4">
-                                    <button
-                                        onClick={() => openEditModal(user)}
-                                        className="text-accent-gold hover:text-white transition-colors text-sm font-bold uppercase"
-                                    >
-                                        Edit
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                    </div>
+                                </div>
+                                <div className="bg-dark-900/50 rounded-lg p-2 border border-white/5">
+                                    <div className="text-[10px] uppercase text-gray-500 font-bold mb-1">Role</div>
+                                    <div className={`text-xs font-bold px-2 py-0.5 rounded inline-block ${roleColors[user.role] || 'bg-gray-700 text-gray-400'}`}>
+                                        {user.role}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-center text-xs text-gray-400 border-t border-white/5 pt-4">
+                                <div>
+                                    <span className="block font-bold text-white">{user.totalHours?.toFixed(1)}</span>
+                                    <span className="text-[10px] uppercase">Hours</span>
+                                </div>
+                                <div className="text-right">
+                                    <span className="block font-bold text-white">{user.totalFlights}</span>
+                                    <span className="text-[10px] uppercase">Flights</span>
+                                </div>
+                                <div className="text-right">
+                                    <span className="block font-bold text-emerald-400">${user.totalCredits?.toLocaleString()}</span>
+                                    <span className="text-[10px] uppercase">Credits</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
 
+            {filteredUsers.length === 0 && (
+                <div className="text-center py-20 text-gray-500 glass-card">
+                    <UserX className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                    <p className="text-lg">No pilots found matching "{searchTerm}"</p>
+                </div>
+            )}
             {/* Edit Modal */}
             {selectedUser && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
