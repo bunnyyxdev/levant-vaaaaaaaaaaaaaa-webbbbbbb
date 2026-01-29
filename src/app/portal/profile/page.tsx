@@ -19,6 +19,7 @@ interface Pilot {
     simbrief_id?: string;
     avatar_url?: string;
     total_hours: number;
+    transfer_hours: number;
     total_flights: number;
     total_credits: number;
     current_location: string;
@@ -269,7 +270,7 @@ export default function ProfilePage() {
                             </span>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
                             <div className="bg-dark-700/50 p-3 rounded-lg">
                                 <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Rank</p>
                                 <RankBadge rank={pilot.rank} size="md" />
@@ -283,8 +284,12 @@ export default function ProfilePage() {
                                 <p className="text-green-400 font-mono font-semibold">${pilot.total_credits.toLocaleString()}</p>
                             </div>
                             <div className="bg-dark-700/50 p-3 rounded-lg">
-                                <p className="text-gray-500 text-xs uppercase tracking-wider">Hours</p>
+                                <p className="text-gray-500 text-xs uppercase tracking-wider">ACARS Hrs</p>
                                 <p className="text-white font-mono font-semibold">{pilot.total_hours.toFixed(1)}h</p>
+                            </div>
+                            <div className="bg-dark-700/50 p-3 rounded-lg">
+                                <p className="text-gray-500 text-xs uppercase tracking-wider">Transfer</p>
+                                <p className="text-gray-300 font-mono font-semibold">{(pilot.transfer_hours || 0).toFixed(1)}h</p>
                             </div>
                         </div>
 

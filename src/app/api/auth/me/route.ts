@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
                 role: payload.role,
                 status: payload.status,
                 simbriefId: pilot?.simbrief_id || '',
+                totalHours: (pilot?.total_hours || 0) + (pilot?.transfer_hours || 0),
             }
         });
     } catch (error) {

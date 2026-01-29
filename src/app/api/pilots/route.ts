@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
                         status: pilot.status,
                         role: pilot.role,
                         total_hours: pilot.total_hours,
+                        transfer_hours: pilot.transfer_hours || 0,
                         total_flights: pilot.total_flights,
                         total_credits: pilot.total_credits,
                         current_location: pilot.current_location,
