@@ -20,9 +20,6 @@ export async function proxy(request: NextRequest) {
         }
     }
 
-    // Skip auth middleware for static assets, public files, and the blacklist page itself
-    // Also skip API routes for AUTH check (they handle their own auth usually, or we can add it here if needed)
-    // But original code skipped API for the auth part.
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api') || // Keep skipping API for the Login Redirect logic below
@@ -44,10 +41,6 @@ export async function proxy(request: NextRequest) {
                 return NextResponse.rewrite(new URL('/404', request.url));
             }
 
-            // Redirect authenticated users away from login/register
-            if (pathname === '/login' || pathname === '/register') {
-                return NextResponse.redirect(new URL('/portal/dashboard', request.url));
-            }
         } catch (error) {
             // Token invalid - clear it and redirect to login if on protected route
             const response = pathname.startsWith('/portal')
