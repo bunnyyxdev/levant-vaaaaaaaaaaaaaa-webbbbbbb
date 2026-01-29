@@ -32,6 +32,10 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('auth_token')?.value;
 
     if (token) {
+        if (pathname === '/login') {
+            console.log('Middleware: Already logged in, redirecting to dashboard');
+            return NextResponse.redirect(new URL('/portal/dashboard', request.url));
+        }
         try {
             const secret = new TextEncoder().encode(jwtSecret);
             const { payload } = await jwtVerify(token, secret);
