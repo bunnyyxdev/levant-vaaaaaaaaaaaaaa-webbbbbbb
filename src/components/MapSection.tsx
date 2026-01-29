@@ -31,7 +31,12 @@ export default function MapSection() {
     const [flights, setFlights] = useState<Flight[]>([]);
 
     useEffect(() => {
+        let interval: NodeJS.Timeout;
+        
         const fetchFlights = async () => {
+            // Don't fetch if the page is hidden (optimization)
+            if (document.hidden) return;
+
             try {
                 const response = await fetch('/api/flights');
                 if (response.ok) {
@@ -48,9 +53,25 @@ export default function MapSection() {
         };
 
         fetchFlights();
-        const interval = setInterval(fetchFlights, 10000); // Update every 10s
+        
+        // Polling every 20 seconds (optimized from 10s)
+        interval = setInterval(fetchFlights, 20000);
 
-        return () => clearInterval(interval);
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                clearInterval(interval);
+            } else {
+                fetchFlights();
+                interval = setInterval(fetchFlights, 20000);
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, []);
 
     return (

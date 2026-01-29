@@ -9,6 +9,12 @@ const nextConfig = {
             },
         ],
     },
+    experimental: {
+        serverActions: {
+            bodySizeLimit: '500mb',
+        },
+        proxyClientMaxBodySize: '500mb',
+    },
 }
 
 module.exports = nextConfig

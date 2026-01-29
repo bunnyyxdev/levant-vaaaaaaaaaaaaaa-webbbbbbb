@@ -12,7 +12,8 @@ import {
     Settings,
     ArrowRight,
     Loader2,
-    Check
+    Check,
+    Gauge
 } from 'lucide-react';
 
 interface AdminStats {
@@ -71,6 +72,12 @@ export default function AdminPage() {
             link: '/portal/admin/reports',
             count: stats?.pendingPireps,
             alert: (stats?.pendingPireps || 0) > 0
+        },
+        { 
+            title: 'ACARS Management', 
+            description: 'Upload latest installer and plugin versions.',
+            icon: <Gauge className="w-8 h-8 text-red-400" />,
+            link: '/portal/admin/acars'
         },
     ];
 

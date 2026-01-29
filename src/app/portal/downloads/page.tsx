@@ -1,43 +1,42 @@
 'use client';
 
-import { useState } from 'react';
-import { Download, FileText, ExternalLink, Shield, ShoppingBag, Radio, Monitor, Archive, BookOpen, X, ChevronRight, Gauge } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Download, FileText, ExternalLink, Shield, ShoppingBag, Radio, Monitor, Archive, BookOpen, X, ChevronRight, Gauge, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+
+interface AcarsFile {
+    type: 'exe' | 'zip';
+    version: string;
+    filePath: string;
+    size: string;
+    notes?: string;
+    uploadedAt: string;
+}
 
 export default function DownloadsPage() {
     const [showAcarsModal, setShowAcarsModal] = useState(false);
+    const [acarsFiles, setAcarsFiles] = useState<AcarsFile[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const resources = [
-        {
-            title: 'Pilot Handbook',
-            version: '2024 Edition',
-            description: 'Essential rules, SOPs, and guidelines for flying with Levant Virtual Airline.',
-            icon: <FileText className="w-8 h-8 text-accent-gold" />,
-            status: 'Recommended',
-            link: '/portal/handbook',
-            category: 'Documentation'
-        },
-        {
-            title: 'Levant Pilot Pack',
-            version: 'v1.2',
-            description: 'Complete collection of checklists, fleet data, and SOPs in one downloadable archive.',
-            icon: <Archive className="w-8 h-8 text-blue-400" />,
-            status: 'Essential',
-            link: '#',
-            category: 'Data'
-        },
-    ];
+    useEffect(() => {
+        const fetchLatest = async () => {
+            try {
+                const res = await fetch('/api/acars/latest');
+                if (res.ok) {
+                    const data = await res.json();
+                    setAcarsFiles(data.files);
+                }
+            } catch (err) {
+                console.error('Failed to fetch ACARS info:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchLatest();
+    }, []);
 
-    const acarsVersions = [
-        {
-            name: 'Windows Installer',
-            type: 'exe',
-            size: '85 MB',
-            desc: 'Recommended for most users. Includes auto-updater.',
-            icon: <Monitor className="w-5 h-5 text-blue-400" />,
-            url: '#'
-        },
-    ];
+    const exeFile = acarsFiles.find(f => f.type === 'exe');
+    const zipFile = acarsFiles.find(f => f.type === 'zip');
 
     return (
         <div className="space-y-8 relative">
@@ -45,9 +44,9 @@ export default function DownloadsPage() {
             <div>
                 <h1 className="text-3xl font-bold text-white flex items-center gap-3">
                     <Download className="w-8 h-8 text-accent-gold" />
-                    Downloads & Resources
+                    Downloads
                 </h1>
-                <p className="text-gray-400 mt-2">Essential tools and documentation for your career</p>
+                <p className="text-gray-400 mt-2">Essential tools for your career</p>
             </div>
 
             {/* ACARS Hero Section */}
@@ -62,11 +61,22 @@ export default function DownloadsPage() {
                              <span className="text-blue-400 font-bold tracking-wider text-sm">OFFICIAL SOFTWARE</span>
                         </div>
                         <h2 className="text-3xl font-bold text-white">Levant ACARS Tracker</h2>
-                        <div className="flex items-center gap-4 text-sm text-gray-400 font-mono">
-                            <span>v1.4.2</span>
-                            <span className="w-1 h-1 bg-gray-600 rounded-full" />
-                            <span>Updated: Jan 24, 2026</span>
-                        </div>
+                        
+                        {loading ? (
+                            <div className="flex items-center gap-2 text-gray-500 font-mono text-sm">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Loading version info...
+                            </div>
+                        ) : exeFile ? (
+                            <div className="flex items-center gap-4 text-sm text-gray-400 font-mono">
+                                <span>v{exeFile.version}</span>
+                                <span className="w-1 h-1 bg-gray-600 rounded-full" />
+                                <span>Updated: {new Date(exeFile.uploadedAt).toLocaleDateString()}</span>
+                            </div>
+                        ) : (
+                            <div className="text-sm text-yellow-500/60 font-mono">No version uploaded yet</div>
+                        )}
+
                         <p className="text-gray-300 leading-relaxed max-w-xl">
                             Our custom-built flight tracking software is the heart of your operations. 
                             It automatically records your flight data, monitors your landing rate, and submits PIREPs directly to our system.
@@ -100,76 +110,8 @@ export default function DownloadsPage() {
                 </div>
             </div>
 
-            {/* Other Resources Grid */}
-            <h2 className="text-xl font-bold text-white pt-4">Additional Resources</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {resources.map((item) => (
-                    <div key={item.title} className="glass-card p-6 flex flex-col justify-between border border-white/5 hover:border-accent-gold/20 transition-all group">
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-start">
-                                <div className="p-3 bg-dark-700 rounded-xl group-hover:scale-110 transition-transform">
-                                    {item.icon}
-                                </div>
-                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest ${
-                                    item.status === 'Required' ? 'bg-red-500/10 text-red-500' : 
-                                    item.status === 'Recommended' ? 'bg-blue-500/10 text-blue-500' : 'bg-white/10 text-gray-400'
-                                }`}>
-                                    {item.status}
-                                </span>
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <h3 className="text-lg font-bold text-white">{item.title}</h3>
-                                    <span className="text-xs text-gray-500 font-mono">{item.version}</span>
-                                </div>
-                                <p className="text-gray-400 text-sm mt-2">{item.description}</p>
-                            </div>
-                        </div>
-                        
-                        <div className="mt-6 pt-6 border-t border-white/5">
-                            <Link 
-                                href={item.link}
-                                className="w-full bg-dark-700 hover:bg-white/10 text-white py-2.5 rounded-lg font-bold transition-all flex items-center justify-center gap-2 group/btn"
-                            >
-                                <Download className="w-4 h-4 group-hover/btn:translate-y-0.5 transition-all text-accent-gold" />
-                                {item.category === 'Documentation' ? 'Read Online' : 'Download Now'}
-                            </Link>
-                        </div>
-                    </div>
-                ))}
-
-                 {/* Fleet Liveries Card */}
-                <div className="glass-card p-6 flex flex-col justify-between border border-white/5 hover:border-accent-gold/20 transition-all group bg-gradient-to-br from-accent-gold/5 to-transparent">
-                     <div className="space-y-4">
-                         <div className="flex justify-between items-start">
-                             <div className="p-3 bg-accent-gold/10 rounded-xl group-hover:scale-110 transition-transform">
-                                 <ShoppingBag className="w-8 h-8 text-accent-gold" />
-                             </div>
-                             <span className="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest bg-yellow-500/10 text-yellow-500">
-                                 Store
-                             </span>
-                         </div>
-                         <div>
-                            <h3 className="text-lg font-bold text-white">Aircraft Liveries</h3>
-                            <p className="text-gray-400 text-sm mt-2">
-                                Exclusive 8K liveries for our fleet. Redeem your flight points to unlock these premium downloads.
-                            </p>
-                        </div>
-                     </div>
-                     <div className="mt-6 pt-6 border-t border-white/5">
-                            <Link 
-                                href="/portal/store"
-                                className="w-full bg-accent-gold hover:opacity-90 text-dark-900 py-2.5 rounded-lg font-bold transition-all flex items-center justify-center gap-2"
-                            >
-                                <ShoppingBag className="w-4 h-4" />
-                                Visit Pilot Store
-                            </Link>
-                    </div>
-                </div>
-            </div>
-
             {/* Security Note */}
-            <div className="glass-card p-6 flex items-start gap-4">
+            <div className="glass-card p-6 flex items-start gap-4 mt-8">
                  <Shield className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
                  <div>
                      <h3 className="text-white font-semibold mb-1">Secure Downloads</h3>
@@ -203,21 +145,34 @@ export default function DownloadsPage() {
 
                         {/* Modal Body */}
                         <div className="p-6 space-y-3">
-                            {acarsVersions.map((ver) => (
+                            {acarsFiles.length === 0 && !loading && (
+                                <div className="text-center py-8 text-gray-500 italic">
+                                    No files available for download yet.
+                                </div>
+                            )}
+                            {acarsFiles.map((ver) => (
                                 <a 
-                                    key={ver.name}
-                                    href={ver.url}
+                                    key={ver.type}
+                                    href={ver.filePath}
+                                    download
                                     className="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-accent-gold/30 transition-all group"
                                 >
                                     <div className="p-3 bg-dark-900 rounded-lg group-hover:scale-110 transition-transform">
-                                        {ver.icon}
+                                        {ver.type === 'exe' ? <Monitor className="w-6 h-6 text-blue-400" /> : <Radio className="w-6 h-6 text-green-400" />}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between items-center mb-1">
-                                            <h4 className="font-bold text-white">{ver.name}</h4>
+                                            <h4 className="font-bold text-white">
+                                                {ver.type === 'exe' ? 'Windows Installer' : 'X-Plane Plugin'}
+                                            </h4>
                                             <span className="text-xs text-gray-500 font-mono">{ver.size}</span>
                                         </div>
-                                        <p className="text-sm text-gray-400">{ver.desc}</p>
+                                        <p className="text-sm text-gray-400 mb-2">Version {ver.version}</p>
+                                        {ver.notes && (
+                                            <div className="mt-2 text-xs text-gray-500 line-clamp-2 italic border-l border-white/10 pl-3">
+                                                "{ver.notes}"
+                                            </div>
+                                        )}
                                     </div>
                                     <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-accent-gold transition-colors" />
                                 </a>

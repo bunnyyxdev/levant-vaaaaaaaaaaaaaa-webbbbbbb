@@ -18,6 +18,7 @@ import {
     ShoppingBag,
     Download,
     Award,
+    Gauge,
     LucideIcon
 } from 'lucide-react';
 
@@ -80,6 +81,7 @@ export default function Sidebar() {
             items: [
                 { name: 'User Management', path: '/portal/admin/users', icon: User },
                 { name: 'PIREP Management', path: '/portal/admin/pireps', icon: FileText },
+                { name: 'ACARS Management', path: '/portal/admin/acars', icon: Gauge },
                 { name: 'Tour Management', path: '/portal/admin/tours', icon: Map },
                 { name: 'Badge Management', path: '/portal/admin/badges', icon: Award },
                 { name: 'Store Management', path: '/portal/admin/store', icon: ShoppingBag },
