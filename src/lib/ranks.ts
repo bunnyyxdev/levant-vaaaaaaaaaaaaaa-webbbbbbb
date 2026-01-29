@@ -13,7 +13,8 @@ export async function checkAndUpgradeRank(pilotId: string): Promise<string | nul
         if (!pilot) return null;
 
         const currentRankName = pilot.rank;
-        const currentHours = pilot.total_hours;
+        // Total stats for rank = Flown Hours + Transfer Hours
+        const currentHours = (pilot.total_hours || 0) + (pilot.transfer_hours || 0);
         const currentFlights = pilot.total_flights;
 
         // Fetch all ranks sorted by order

@@ -12,6 +12,7 @@ interface User {
     role: string;
     status: string;
     totalHours: number;
+    transferHours: number;
     totalFlights: number;
     totalCredits: number;
     rank: string;
@@ -81,6 +82,7 @@ export default function AdminUsersPage() {
             timezone: user.timezone,
             currentLocation: user.currentLocation,
             totalHours: user.totalHours,
+            transferHours: user.transferHours,
             totalFlights: user.totalFlights,
             totalCredits: user.totalCredits,
         });
@@ -438,15 +440,27 @@ export default function AdminUsersPage() {
                             </div>
 
                             {/* Total Hours */}
-                            <div>
-                                <label className="block text-sm text-gray-400 mb-1">Total Hours</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    value={editForm.totalHours ?? 0}
-                                    onChange={e => setEditForm({ ...editForm, totalHours: parseFloat(e.target.value) || 0 })}
-                                    className="w-full bg-dark-700 border border-white/10 rounded px-3 py-2 text-white"
-                                />
+                            <div className="md:col-span-2 grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm text-gray-400 mb-1">Total Hours (ACARS)</label>
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        value={editForm.totalHours ?? 0}
+                                        onChange={e => setEditForm({ ...editForm, totalHours: parseFloat(e.target.value) || 0 })}
+                                        className="w-full bg-dark-700 border border-white/10 rounded px-3 py-2 text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-gray-400 mb-1">Transfer Hours</label>
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        value={editForm.transferHours ?? 0}
+                                        onChange={e => setEditForm({ ...editForm, transferHours: parseFloat(e.target.value) || 0 })}
+                                        className="w-full bg-dark-700 border border-white/10 rounded px-3 py-2 text-white"
+                                    />
+                                </div>
                             </div>
 
                             {/* Total Flights */}

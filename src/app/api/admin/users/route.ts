@@ -33,6 +33,7 @@ export async function GET() {
             timezone: user.timezone,
             currentLocation: user.current_location,
             totalHours: user.total_hours || 0,
+            transferHours: user.transfer_hours || 0,
             totalFlights: user.total_flights || 0,
             totalCredits: user.total_credits || 0,
             createdAt: user.created_at,
@@ -86,6 +87,7 @@ export async function PUT(request: NextRequest) {
             timezone: 'timezone',
             currentLocation: 'current_location',
             totalHours: 'total_hours',
+            transferHours: 'transfer_hours',
             totalFlights: 'total_flights',
             totalCredits: 'total_credits',
         };
@@ -122,7 +124,7 @@ export async function PUT(request: NextRequest) {
         }
 
         // Auto-check for rank promotion if hours/flights changed
-        if (updates.totalHours || updates.totalFlights) {
+        if (updates.totalHours || updates.transferHours || updates.totalFlights) {
             await checkAndUpgradeRank(userId);
         }
 
