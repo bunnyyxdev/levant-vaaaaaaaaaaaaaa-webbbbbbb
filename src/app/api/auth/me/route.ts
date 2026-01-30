@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
         // Fetch additional user data from database
         await connectDB();
-        const pilot = await Pilot.findById(payload.id).select('simbrief_id pilot_id');
+        const pilot = await Pilot.findById(payload.id).select('simbrief_id pilot_id desired_callsign');
 
         return NextResponse.json({
             user: {
@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
                 role: payload.role,
                 status: payload.status,
                 simbriefId: pilot?.simbrief_id || '',
+                customCallsign: pilot?.desired_callsign || '',
                 totalHours: (pilot?.total_hours || 0) + (pilot?.transfer_hours || 0),
             }
         });

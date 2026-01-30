@@ -32,9 +32,10 @@ function DispatchContent() {
     const [aircraftType, setAircraftType] = useState('');
     const [flightNumber, setFlightNumber] = useState('');
     const [weightUnit, setWeightUnit] = useState<'KGS' | 'LBS'>('KGS');
+    const [customCallsign, setCustomCallsign] = useState('');
     
     // Derived callsign
-    const callsign = `LVT${flightNumber}`;
+    const callsign = customCallsign || `LVT${flightNumber}`;
     
     const [flightType, setFlightType] = useState<'passenger' | 'cargo'>('passenger');
     const [passengers, setPassengers] = useState('');
@@ -76,7 +77,12 @@ function DispatchContent() {
                 const authData = await authRes.json();
                 if (authData.user) {
                     const pilotNum = authData.user.pilotId?.replace(/\D/g, '') || '';
-                    setFlightNumber(pilotNum.padStart(4, '0')); // Ensure 4 digits logic or as is
+                    setFlightNumber(pilotNum.padStart(4, '0')); 
+                    
+                    // Custom Callsign Logic
+                    if (authData.user.customCallsign) {
+                        setCustomCallsign(authData.user.customCallsign);
+                    }
                 }
 
                 // Pre-fill from URL params if present
