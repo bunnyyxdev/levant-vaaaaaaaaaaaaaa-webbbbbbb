@@ -273,23 +273,32 @@ function DispatchContent() {
                             )}
                         </div>
                         
-                        {/* Callsign Split */}
+                        {/* Callsign Display */}
                         <div>
                             <label className="block text-sm text-gray-400 mb-2">Callsign</label>
-                            <div className="flex gap-2">
+                            {customCallsign ? (
                                 <input
                                     type="text"
-                                    value="LVT"
+                                    value={customCallsign}
                                     readOnly
-                                    className="w-20 bg-dark-800 border border-white/10 rounded-lg px-3 py-3 text-white font-mono uppercase text-center font-bold opacity-70 cursor-not-allowed"
+                                    className="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white font-mono text-lg uppercase font-bold text-center opacity-70 cursor-not-allowed tracking-widest"
                                 />
-                                <input
-                                    type="text"
-                                    value={flightNumber}
-                                    readOnly
-                                    className="flex-1 bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white font-mono uppercase cursor-not-allowed opacity-70"
-                                />
-                            </div>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value="LVT"
+                                        readOnly
+                                        className="w-20 bg-dark-800 border border-white/10 rounded-lg px-3 py-3 text-white font-mono uppercase text-center font-bold opacity-70 cursor-not-allowed"
+                                    />
+                                    <input
+                                        type="text"
+                                        value={flightNumber}
+                                        readOnly
+                                        className="flex-1 bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white font-mono uppercase cursor-not-allowed opacity-70"
+                                    />
+                                </div>
+                            )}
                         </div>
 
 
