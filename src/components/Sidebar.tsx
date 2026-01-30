@@ -19,7 +19,9 @@ import {
     Download,
     Award,
     Gauge,
-    LucideIcon
+    HardDrive,
+    LucideIcon,
+    Palette
 } from 'lucide-react';
 
 interface MenuItem {
@@ -77,11 +79,16 @@ export default function Sidebar() {
             ],
         },
         {
+            category: 'FILE MANAGEMENT',
+            items: [
+                { name: 'ACARS Software', path: '/portal/admin/acars', icon: Gauge },
+                { name: 'Skin File Manager', path: '/portal/admin/files', icon: Palette },
+            ],
+        },
+        {
             category: 'ADMIN',
             items: [
                 { name: 'User Management', path: '/portal/admin/users', icon: User },
-                { name: 'PIREP Management', path: '/portal/admin/pireps', icon: FileText },
-                { name: 'ACARS Management', path: '/portal/admin/acars', icon: Gauge },
                 { name: 'Tour Management', path: '/portal/admin/tours', icon: Map },
                 { name: 'Badge Management', path: '/portal/admin/badges', icon: Award },
                 { name: 'Store Management', path: '/portal/admin/store', icon: ShoppingBag },
@@ -110,7 +117,8 @@ export default function Sidebar() {
 
             <div className="flex-1 px-4 space-y-8">
                 {menuItems.map((category) => {
-                    if (category.category === 'ADMIN' && !isAdmin) return null;
+                    const adminCategories = ['ADMIN', 'FILE MANAGEMENT'];
+                    if (adminCategories.includes(category.category) && !isAdmin) return null;
                     return (
                         <div key={category.category}>
                             <h3 className="text-xs font-semibold text-gray-500 tracking-wider mb-4 px-2">

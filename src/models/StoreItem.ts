@@ -15,7 +15,7 @@ const StoreItemSchema = new Schema<IStoreItem>({
     name: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true, min: 0 },
-    category: { type: String, enum: ['Aircraft', 'Badge', 'Perk', 'Other'], default: 'Other' },
+    category: { type: String, enum: ['Aircraft', 'Badge', 'Perk', 'Skin', 'Other'], default: 'Other' },
     image: { type: String },
     download_url: { type: String },
     active: { type: Boolean, default: true },

@@ -145,8 +145,11 @@ async function handlePosition(params: {
     const { pilotId, callsign, latitude, longitude, altitude, heading, groundSpeed, status } = params;
 
     try {
+        const pilot = await Pilot.findOne({ pilot_id: pilotId });
+        if (!pilot) return NextResponse.json({ error: 'Pilot not found' }, { status: 404 });
+
         const flight = await ActiveFlight.findOneAndUpdate(
-            { pilot_id: pilotId, callsign },
+            { pilot_id: pilot._id, callsign },
             {
                 latitude,
                 longitude,
@@ -195,10 +198,15 @@ async function handleFlightStart(params: {
 
     try {
         const pilot = await Pilot.findOne({ pilot_id: pilotId });
-        const pilotName = pilot ? `${pilot.first_name} ${pilot.last_name}` : 'Unknown Pilot';
+        if (!pilot) return NextResponse.json({ error: 'Pilot not found' }, { status: 404 });
+        
+        const pilotName = `${pilot.first_name} ${pilot.last_name}`;
+
+        // Remove any existing active flight for this pilot to prevent duplicates
+        await ActiveFlight.deleteMany({ pilot_id: pilot._id });
 
         await ActiveFlight.create({
-            pilot_id: pilot?._id,
+            pilot_id: pilot._id,
             pilot_name: pilotName,
             callsign,
             departure_icao: departureIcao,

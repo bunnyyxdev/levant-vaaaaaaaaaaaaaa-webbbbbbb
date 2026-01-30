@@ -54,43 +54,43 @@ export default function LoginPage() {
             <div className="fixed inset-0 bg-gradient-to-br from-dark-900 via-primary-900/10 to-dark-900 -z-10" />
 
             {/* Header */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
                 <Link href="/" className="inline-block mb-4">
-                    <div className="w-25 h-24 mx-auto relative">
-                        <img src="/img/logo.png" alt="Levant Virtual" className="w-full h-full object-contain" />
+                    <div className="w-25 h-24 mx-auto relative group">
+                        <img src="/img/logo.png" alt="Levant Virtual" className="w-full h-full object-contain filter group-hover:brightness-110 transition-all" />
                     </div>
                 </Link>
-                <h1 className="text-3xl font-display font-bold text-white mb-2">Welcome Back</h1>
-                <p className="text-gray-400 text-sm">Sign in to your pilot portal</p>
+                <h1 className="text-4xl font-display font-medium text-white mb-2 tracking-tight">Welcome Back</h1>
+                <p className="text-white/60 text-sm font-medium">Sign in to your pilot portal</p>
             </div>
 
             {/* Login Card */}
-            <div className="glass-card p-8 w-full max-w-md">
+            <div className="bg-white/90 backdrop-blur-2xl p-10 w-full max-w-md rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/20 animate-in zoom-in-95 duration-500">
                 {error && (
-                    <div className="bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg mb-6 text-sm text-center">
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-600 px-4 py-3 rounded-2xl mb-6 text-sm text-center font-bold">
                         {error}
                     </div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-gray-400 text-sm mb-2">Email Address</label>
+                        <label className="block text-gray-500 text-[10px] uppercase font-bold tracking-widest mb-2 ml-1">Email Address</label>
                         <input
                             type="email"
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                            className="w-full bg-black/5 border border-black/5 rounded-2xl px-5 py-4 text-black text-sm focus:outline-none focus:border-primary-500 focus:bg-white transition-all shadow-sm"
                             placeholder="pilot@levant-va.com"
                         />
                     </div>
 
                     <div>
                         <div className="flex justify-between items-center mb-2">
-                            <label className="block text-gray-400 text-sm">Password</label>
-                            <Link href="/forgot-password" className="text-xs text-accent-gold hover:underline">
-                                Forgot password?
+                            <label className="block text-gray-500 text-[10px] uppercase font-bold tracking-widest ml-1">Password</label>
+                            <Link href="/forgot-password" className="text-[10px] uppercase font-bold tracking-widest text-primary-600 hover:text-primary-700 hover:underline transition-colors">
+                                Reset?
                             </Link>
                         </div>
                         <input
@@ -99,7 +99,7 @@ export default function LoginPage() {
                             value={formData.password}
                             onChange={handleInputChange}
                             required
-                            className="w-full bg-dark-700 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                            className="w-full bg-black/5 border border-black/5 rounded-2xl px-5 py-4 text-black text-sm focus:outline-none focus:border-primary-500 focus:bg-white transition-all shadow-sm"
                             placeholder="••••••••"
                         />
                     </div>
@@ -107,17 +107,17 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full btn-primary py-4 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-primary-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                     >
-                        {loading ? 'Signing In...' : 'Sign In'}
+                        {loading ? 'Authenticating...' : 'Sign In To Portal'}
                     </button>
                 </form>
 
-                <div className="mt-6 pt-6 border-t border-white/10 text-center">
-                    <p className="text-gray-500 text-sm">
-                        Don't have an account yet?{' '}
-                        <Link href="/register" className="text-white hover:text-accent-gold transition-colors font-medium">
-                            Register now
+                <div className="mt-8 pt-6 border-t border-black/5 text-center">
+                    <p className="text-gray-400 text-xs font-medium">
+                        Need an account?{' '}
+                        <Link href="/register" className="text-black hover:text-primary-600 transition-colors font-bold">
+                            Create Identity
                         </Link>
                     </p>
                 </div>

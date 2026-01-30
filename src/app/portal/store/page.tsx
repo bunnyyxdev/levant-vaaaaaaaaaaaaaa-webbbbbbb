@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ShoppingBag, CreditCard, CheckCircle, AlertCircle, Package, ArrowRight } from 'lucide-react';
+import { ShoppingBag, CreditCard, CheckCircle, AlertCircle, Package, ArrowRight, Layout, Sparkles, Zap, Star } from 'lucide-react';
 
 interface StoreItem {
     _id: string;
     name: string;
     description: string;
     price: number;
-    category: string;
+    category: 'Aircraft' | 'Badge' | 'Perk' | 'Skin' | 'Other';
     image?: string;
     download_url?: string;
     active: boolean;
@@ -21,6 +21,7 @@ export default function StorePage() {
     const [loading, setLoading] = useState(true);
     const [purchasing, setPurchasing] = useState<string | null>(null);
     const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+    const [activeTab, setActiveTab] = useState<'all' | 'skins' | 'other'>('all');
 
     const fetchStoreData = async () => {
         try {
@@ -66,113 +67,180 @@ export default function StorePage() {
         }
     };
 
-    const getCategoryColor = (category: string) => {
+    const getCategoryStyles = (category: string) => {
         switch (category) {
-            case 'Aircraft': return 'text-blue-400 bg-blue-500/20';
-            case 'Badge': return 'text-purple-400 bg-purple-500/20';
-            case 'Perk': return 'text-green-400 bg-green-500/20';
-            default: return 'text-gray-400 bg-gray-500/20';
+            case 'Skin': return 'from-rose-500/20 to-orange-500/20 text-rose-400 border-rose-500/30';
+            case 'Aircraft': return 'from-blue-500/20 to-cyan-500/20 text-blue-400 border-blue-500/30';
+            case 'Badge': return 'from-purple-500/20 to-pink-500/20 text-purple-400 border-purple-500/30';
+            case 'Perk': return 'from-emerald-500/20 to-teal-500/20 text-emerald-400 border-emerald-500/30';
+            default: return 'from-gray-500/20 to-slate-500/20 text-gray-400 border-gray-500/30';
         }
     };
 
+    const filteredItems = items.filter(item => {
+        if (activeTab === 'all') return true;
+        if (activeTab === 'skins') return item.category === 'Skin';
+        return item.category !== 'Skin';
+    });
+
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="glass-card p-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-3">
-                    <ShoppingBag className="w-8 h-8 text-accent-gold" />
-                    <div>
-                        <h1 className="text-2xl font-bold text-white">Pilot Store</h1>
-                        <p className="text-gray-400">Upgrade your experience with points</p>
+        <div className="space-y-8 animate-in fade-in duration-700">
+            {/* Premium Hero Section */}
+            <div className="relative overflow-hidden rounded-3xl bg-dark-800 border border-white/5 p-8 md:p-12 shadow-2xl">
+                {/* Background Decoration */}
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent-gold/5 rounded-full blur-[100px] pointer-events-none" />
+                <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div className="text-center md:text-left">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-gold/10 border border-accent-gold/20 text-accent-gold text-xs font-bold uppercase tracking-widest mb-4">
+                            <Sparkles className="w-3 h-3" />
+                            Premium Boutique
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4 tracking-tight">
+                            Elevate Your <span className="text-glow text-accent-gold">Experience</span>
+                        </h1>
+                        <p className="text-gray-400 max-w-md text-lg leading-relaxed">
+                            Unlock exclusive ACARS skins, rare aircraft models, and prestige badges using your hard-earned pilot credits.
+                        </p>
                     </div>
-                </div>
-                <div className="bg-dark-700 rounded-xl px-6 py-3 border border-accent-gold/20 flex items-center gap-4">
-                    <div className="text-right">
-                        <p className="text-gray-500 text-xs uppercase tracking-wider">Available Points</p>
-                        <p className="text-2xl font-bold text-accent-gold font-mono">{balance.toLocaleString()}</p>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-accent-gold/20 flex items-center justify-center">
-                        <CreditCard className="w-5 h-5 text-accent-gold" />
+
+                    <div className="flex flex-col items-center">
+                        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-xl flex flex-col items-center min-w-[240px]">
+                            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Current Balance</p>
+                            <div className="flex items-center gap-3">
+                                <span className="text-4xl font-display font-bold text-white tracking-widest leading-none">
+                                    {balance.toLocaleString()}
+                                </span>
+                                <div className="w-8 h-8 rounded-full bg-accent-gold flex items-center justify-center shadow-[0_0_20px_rgba(251,191,36,0.3)]">
+                                    <Zap className="w-4 h-4 text-dark-900 fill-current" />
+                                </div>
+                            </div>
+                            <div className="mt-4 w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-accent-gold to-orange-500 w-[65%]" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {message && (
-                <div className={`p-4 rounded-lg flex items-center gap-3 border ${
-                    message.type === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-red-500/10 border-red-500/30 text-red-400'
-                }`}>
-                    {message.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 flex-shrink-0" />}
-                    <p className="text-sm font-medium">{message.text}</p>
+            {/* Navigation Tabs */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex gap-2 p-1.5 bg-dark-800 rounded-xl border border-white/5 w-fit">
+                    <button 
+                        onClick={() => setActiveTab('all')}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'all' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                    >
+                        Discovery
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('skins')}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'skins' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                    >
+                        <Layout className="w-4 h-4" />
+                        ACARS Skins
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('other')}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'other' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                    >
+                        Aircraft & Rank
+                    </button>
                 </div>
-            )}
 
+                {message && (
+                    <div className={`px-4 py-2.5 rounded-xl border flex items-center gap-3 animate-in fade-in slide-in-from-right-4 duration-300 ${
+                        message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                    }`}>
+                        {message.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                        <span className="text-sm font-bold">{message.text}</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Store Grid */}
             {loading ? (
-                <div className="glass-card p-12 text-center text-gray-400">Loading store items...</div>
-            ) : items.length === 0 ? (
-                <div className="glass-card p-12 text-center text-gray-400">
-                    <Package className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                    <p>No items available in the store yet</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1,2,3].map(i => (
+                        <div key={i} className="h-80 rounded-3xl bg-dark-800 border border-white/5 animate-pulse" />
+                    ))}
+                </div>
+            ) : filteredItems.length === 0 ? (
+                <div className="h-64 rounded-3xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-4 text-gray-500">
+                    <Package className="w-12 h-12 opacity-20" />
+                    <p className="font-medium">No items found in this collection</p>
                 </div>
             ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {items.map((item) => (
-                        <div key={item._id} className="glass-card overflow-hidden group flex flex-col">
-                            {/* Item Header / Image Placeholder */}
-                            <div className="h-32 bg-gradient-to-br from-dark-700 to-dark-600 flex items-center justify-center relative border-b border-white/5">
-                                {item.category === 'Aircraft' ? (
-                                    <span className="text-5xl group-hover:scale-110 transition-transform">✈️</span>
-                                ) : item.category === 'Badge' ? (
-                                    <span className="text-5xl group-hover:scale-110 transition-transform">🎖️</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredItems.map((item) => (
+                        <div key={item._id} className="relative group flex flex-col h-full rounded-[2rem] bg-dark-800 border border-white/5 hover:border-white/10 transition-all duration-500 hover:-translate-y-2 overflow-hidden shadow-xl">
+                            {/* Card Glow Effect */}
+                            <div className={`absolute -inset-0.5 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none ${getCategoryStyles(item.category)}`} />
+
+                            {/* Item Media Container */}
+                            <div className="h-48 relative overflow-hidden flex items-center justify-center bg-gradient-to-br from-dark-700/50 to-dark-900/50">
+                                {item.category === 'Skin' ? (
+                                    <div className="relative w-full h-full p-6 flex flex-col justify-end overflow-hidden">
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 group-hover:scale-125 transition-transform duration-700">
+                                            <Layout size={120} className="text-rose-500" />
+                                        </div>
+                                        <div className="relative z-10 p-4 rounded-xl bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-mono leading-tight text-rose-300">
+                                            .theme-custom {'{'} <br/>
+                                            &nbsp;&nbsp;--primary: #f43f5e; <br/>
+                                            &nbsp;&nbsp;--glass: blur(20px); <br/>
+                                            {'}'}
+                                        </div>
+                                    </div>
+                                ) : item.category === 'Aircraft' ? (
+                                    <span className="text-7xl group-hover:scale-110 transition-transform duration-700 drop-shadow-2xl">✈️</span>
                                 ) : (
-                                    <span className="text-5xl group-hover:scale-110 transition-transform">📦</span>
+                                    <span className="text-7xl group-hover:scale-110 transition-transform duration-700 drop-shadow-2xl">🎖️</span>
                                 )}
-                                <div className={`absolute top-3 right-3 px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider ${getCategoryColor(item.category)}`}>
+
+                                <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-[10px] uppercase font-black tracking-widest border backdrop-blur-md ${getCategoryStyles(item.category)}`}>
                                     {item.category}
                                 </div>
+                                
+                                {item.category === 'Skin' && (
+                                    <div className="absolute top-4 right-4 bg-rose-500 text-white text-[10px] font-black tracking-widest px-2 py-1 rounded flex items-center gap-1 shadow-lg shadow-rose-500/20">
+                                        <Zap className="w-3 h-3 fill-current" /> ACARS READY
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Item Info */}
-                            <div className="p-5 flex-1 flex flex-col">
-                                <h3 className="text-lg font-bold text-white mb-2">{item.name}</h3>
-                                <p className="text-gray-400 text-sm mb-6 flex-1">{item.description}</p>
+                            {/* Item Content */}
+                            <div className="p-8 flex-1 flex flex-col relative z-10">
+                                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-accent-gold transition-colors">{item.name}</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed mb-8 flex-1">{item.description}</p>
                                 
-                                <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
+                                <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/5">
                                     <div className="flex flex-col">
-                                        <span className="text-gray-500 text-[10px] uppercase tracking-wider">Price</span>
-                                        <span className="text-xl font-bold text-accent-gold font-mono">{item.price.toLocaleString()}</span>
+                                        <span className="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em] mb-1">Exchange Price</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-2xl font-display font-bold text-white font-mono group-hover:text-accent-gold transition-colors">{item.price.toLocaleString()}</span>
+                                            <div className="w-4 h-4 rounded-full bg-accent-gold/20 flex items-center justify-center">
+                                                <Star className="w-2.5 h-2.5 text-accent-gold fill-current" />
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {ownedItems.includes(item._id) ? (
                                         <div className="flex flex-col gap-2">
-                                            <div className="bg-green-500/20 text-green-400 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold">
-                                                <CheckCircle className="w-4 h-4" />
-                                                Owned
+                                            <div className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-6 py-2.5 rounded-2xl flex items-center gap-2 text-sm font-black uppercase tracking-widest">
+                                                <CheckCircle className="w-4 h-4 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                                Acquired
                                             </div>
-                                            {item.download_url && (
-                                                <a
-                                                    href={item.download_url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all text-center"
-                                                >
-                                                    Download Content
-                                                </a>
-                                            )}
                                         </div>
                                     ) : (
                                         <button
                                             onClick={() => handlePurchase(item._id)}
                                             disabled={purchasing === item._id || balance < item.price}
-                                            className="bg-accent-gold text-dark-900 px-4 py-2 rounded-lg text-sm font-bold hover:bg-accent-gold/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                            className="relative overflow-hidden group/btn px-8 py-3 rounded-2xl bg-white text-dark-950 font-black text-xs uppercase tracking-[0.2em] hover:bg-accent-gold hover:text-dark-900 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_4px_20px_rgba(255,255,255,0.05)]"
                                         >
-                                            {purchasing === item._id ? (
-                                                <div className="w-4 h-4 border-2 border-dark-900 border-t-transparent rounded-full animate-spin"></div>
-                                            ) : (
-                                                <>
-                                                    Buy Now
-                                                    <ArrowRight className="w-4 h-4" />
-                                                </>
-                                            )}
+                                            <span className="relative z-10 flex items-center gap-2">
+                                                {purchasing === item._id ? 'Processing...' : 'Redeem Now'}
+                                                {!purchasing && <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />}
+                                            </span>
                                         </button>
                                     )}
                                 </div>
@@ -181,6 +249,31 @@ export default function StorePage() {
                     ))}
                 </div>
             )}
+
+            {/* Informational Footer */}
+            <div className="grid md:grid-cols-3 gap-6 pt-12">
+                <div className="p-6 rounded-3xl bg-dark-800 border border-white/5 space-y-3">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                        <Zap className="w-5 h-5 fill-current" />
+                    </div>
+                    <h4 className="text-white font-bold">Earn Points</h4>
+                    <p className="text-sm text-gray-500 leading-relaxed">Fly any scheduled route to accumulate points. Your total credits update instantly after every landing.</p>
+                </div>
+                <div className="p-6 rounded-3xl bg-dark-800 border border-white/5 space-y-3">
+                    <div className="w-10 h-10 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-400">
+                        <Layout className="w-5 h-5" />
+                    </div>
+                    <h4 className="text-white font-bold">ACARS Skins</h4>
+                    <p className="text-sm text-gray-500 leading-relaxed">Once purchased, skins will automatically appear in your ACARS Settings for download and activation.</p>
+                </div>
+                <div className="p-6 rounded-3xl bg-dark-800 border border-white/5 space-y-3">
+                    <div className="w-10 h-10 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+                        <Star className="w-5 h-5 fill-current" />
+                    </div>
+                    <h4 className="text-white font-bold">Premium Status</h4>
+                    <p className="text-sm text-gray-500 leading-relaxed">Certain items grant special Discord roles and prestige badges visible on your public pilot profile.</p>
+                </div>
+            </div>
         </div>
     );
 }

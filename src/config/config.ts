@@ -59,6 +59,7 @@ export const discordWebhooks = {
     landing: 'https://discord.com/api/webhooks/1466214163742326981/IGGoTrqGncm-lH4GM-RjZbL1zEh9JFh0aVPxmqVINkMDs10liyeTYrsuNipbKZvFJbrm',
     rankPromote: 'https://discord.com/api/webhooks/1466214165948665858/jqCkfC6-3Ane8TLw-hq7nNJnZnjrrTjsPLvVn0Dl08mZMr8IiXCq9-tqXzKkWxdABI2e',
     acarsRelease: 'https://discord.com/api/webhooks/1466474783297376268/MB9rsnEwSqBMwM1OrZpx3m89DiaGSxMsJzw8QpVvxvhS6qRaGBlNEXl6VGEA5ASuTczT',
+    skinUpdate: 'https://discord.com/api/webhooks/1466474783297376268/MB9rsnEwSqBMwM1OrZpx3m89DiaGSxMsJzw8QpVvxvhS6qRaGBlNEXl6VGEA5ASuTczT',
     errorLog: 'https://discord.com/api/webhooks/1331665427138379897/T-Ie9F-6e_6hE-Uv8M-Uj8uY_5-6U-9u6E_6hE-Uv8M-Uj8uY_5-6U-9u'
 };
 
