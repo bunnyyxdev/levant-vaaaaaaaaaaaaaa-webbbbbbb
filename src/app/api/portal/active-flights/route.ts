@@ -18,6 +18,11 @@ const getActiveFlights = unstable_cache(
             departure: flight.departure_icao,
             arrival: flight.arrival_icao,
             equipment: flight.aircraft_type,
+            latitude: flight.latitude,
+            longitude: flight.longitude,
+            altitude: flight.altitude,
+            heading: flight.heading,
+            groundSpeed: flight.ground_speed,
             status: flight.status,
         }));
     },
